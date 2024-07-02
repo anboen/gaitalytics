@@ -1,0 +1,6 @@
+/.coverage
+dist
+*.egg-info
+.idea
+.pixi
+out
