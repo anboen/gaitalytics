@@ -1,7 +1,7 @@
 import pytest
-import gaitalytics as storage
-import gaitalytics as mapping
-import gaitalytics as input
+import gaitalytics.storage as storage
+import gaitalytics.mapping as mapping
+import gaitalytics.input as input
 from pathlib import Path
 
 INPUT_FILE: Path = Path('tests/data/test_healthy.c3d')

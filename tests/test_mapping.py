@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from gaitalytics import mapping
 from gaitalytics.input import EzC3dFileHandler
-from gaitalytics import DataCategoryType
+from gaitalytics.model import DataCategoryType
 from pathlib import Path
 
 INPUT_FILE: Path = Path('tests/data/test_healthy.c3d')
