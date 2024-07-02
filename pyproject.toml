@@ -8,26 +8,27 @@ dynamic = ["version"]
 description = "Add a short description here"
 authors = [{name = "André Böni", email = "andre.boeni@llui.org"}]
 requires-python = ">= 3.11.0, < 3.12.0"
-dependencies = ["pandas", "numpy", "h5py"]
+dependencies = ["numpy", "h5py"]
 
 [tool.setuptools_scm]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "cleanpy"]
+test = ["pytest", "pytest-cov", "cleanpy", "mypy"]
 build = ["twine", "setuptools", "setuptools_scm", "build", "cleanpy"]
-docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
+docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints", "sphinx_github_changelog"]
 
 [tool.pixi.project]
-channels = ["conda-forge", "opensim-org"]
+channels = ["conda-forge"]
 platforms = ["win-64"]
 
 [tool.pixi.pypi-dependencies]
 gaitalytics = { path = ".", editable = true }
 
 [tool.pixi.dependencies]
-opensim = ">=4.5,<5"
-ezc3d = ">=1.5.10,<1.6"
 pixi-pycharm = ">=0.0.6,<0.1"
+ezc3d = ">=1.5.10,<1.6"
+pyomeca = ">=2021.0.1,<2021.1"
+python-dateutil = ">=2.9.0,<2.10"
 
 # Environments
 [tool.pixi.environments]
@@ -44,6 +45,7 @@ docs = "sphinx-build -M html ./docs ./docs/_build -W --keep-going"
 [tool.pixi.feature.test.tasks]
 clean-test = "cleanpy --include-testing --exclude .pixi ."
 test = "pytest -vv --cov=gaitalytics"
+mypy = "mypy gaitalytics"
 
 [tool.pixi.feature.build.tasks]
 clean-build = "cleanpy --include-builds --include-metadata --exclude .pixi ."

@@ -1,4 +1,5 @@
 from enum import Enum
+
 import numpy as np
 import pandas as pd
 
@@ -20,7 +21,7 @@ class DataCategory:
     def __init__(self,
                  type: DataCategoryType,
                  frame_rate: float,
-                 time_list: list[float] = None
+                 time_list: np.ndarray
                  ):
         """
         Initialize a DataCategory object.
@@ -31,15 +32,15 @@ class DataCategory:
              with the category.
             frame_rate (float): The frame rate of the data.
         """
-        self.type: DataCategory = type
+        self.type: DataCategoryType = type
         self.frame_rate: float = frame_rate
-        self.table: pd.DataFrame = None
+        self.table: pd.DataFrame
         self.units: list[str] = []
         if time_list is not None:
-            self.table: pd.DataFrame = pd.DataFrame(
+            self.table = pd.DataFrame(
                 {self.COLUMN_NAME_TIME: time_list})
         else:
-            self.table: pd.DataFrame = None
+            self.table = None
 
     def get_time_list(self) -> np.ndarray:
         """
@@ -89,14 +90,14 @@ class Events:
 
     def __init__(self,
                  label: list[str],
-                 time: list[float],
+                 time: np.ndarray,
                  context: list[str]):
         """
         Initialize an Events object.
 
         Args:
             label (list[str]): The label of the event.
-            time (list[float]): The time of the event.
+            time (np.ndarray): The time of the event.
             context (list[str]): The context of the event.
         """
         self.table = pd.DataFrame({
@@ -105,7 +106,7 @@ class Events:
             self.COLUMN_NAME_CONTEXT: context
         })
 
-    def get_event(self, index: int) -> list[str, float, str]:
+    def get_event(self, index: int) -> tuple[str, float, str]:
         """
         Get the event at a specific index.
 
@@ -131,7 +132,7 @@ class Trial:
         Initialize a Trial object.
         """
         self.data_categories: dict[DataCategoryType, DataCategory] = {}
-        self.events: Events = None
+        self.events: Events
 
     def add_data_category(self, data_category: DataCategory):
         """

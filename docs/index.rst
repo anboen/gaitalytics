@@ -1,8 +1,3 @@
-.. gaitalytics documentation master file, created by
-sphinx-quickstart on Tue Jul  2 18:02:16 2024.
-You can adapt this file completely to your liking, but it should at least
-contain the root `toctree` directive.
-
 Welcome to gaitalytics's documentation!
 =======================================
 
@@ -12,8 +7,9 @@ Welcome to gaitalytics's documentation!
 .. automodule:: gaitalytics.input
     :members:
     :inherited-members:
-
-
+.. changelog::
+    :github: https://github.com/DART-Lab-LLUI/python-gaitalytics
+    :pypi: https://pypi.org/project/gaitalytics/
 
 Indices and tables
 ==================

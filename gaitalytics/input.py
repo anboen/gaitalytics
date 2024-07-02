@@ -1,10 +1,11 @@
-import ezc3d
-import importlib
 import collections
+from abc import ABC, abstractmethod
+from pathlib import PurePath, Path
+
+import ezc3d
 import numpy as np
 import pandas as pd
-from abc import ABC, abstractmethod
-from pathlib import PurePath
+import pyomeca
 
 
 class _BaseInputFileReader(ABC):
@@ -30,7 +31,6 @@ class _BaseInputFileReader(ABC):
 
 
 class AnalogInputFileReader(_BaseInputFileReader):
-
     """
     Abstract base class for reading analog input files.
     """
@@ -143,15 +143,13 @@ class PointInputFileReader(_BaseInputFileReader):
         pass
 
     @abstractmethod
-    def get_point_units(self, index: int) -> list[str]:
+    def get_point_units(self) -> list[str]:
         """
-        Get the units of the point at the specified index.
+        Get the units of the points.
 
-        Args:
-            index (int): The index of the point.
 
         Returns:
-            list[str]: The units of the point.
+            list[str]: The units of the points.
 
         """
         pass
@@ -229,7 +227,6 @@ class _EzC3dBaseReader(_BaseInputFileReader):
     A base class for reading C3D files using the EzC3d library.
 
     Attributes:
-        _ez (module): The imported EzC3d module.
         _c3d (EzC3d): The C3D object representing the file.
 
     """
@@ -254,12 +251,12 @@ class _EzC3dBaseReader(_BaseInputFileReader):
         self._print_structure(self._c3d)
 
     @staticmethod
-    def _print_structure(node, prefix: str = ""):
+    def _print_structure(node: any, prefix: str = ""):
         """
         Recursively prints the structure of a node in the C3D file.
 
         Args:
-            node (dict): The node to print the structure of.
+            node (any): The node to print the structure of.
             prefix (str): The prefix to add to each line.
 
         """
@@ -296,7 +293,7 @@ class _EzC3dBaseReader(_BaseInputFileReader):
         end_time = last_index / frame_rate
         start_time = first_index / frame_rate
 
-        return np.arange(start_time, end_time, 1/frame_rate)
+        return np.arange(start_time, end_time, 1 / frame_rate)
 
 
 class _EzC3dPointReader(_EzC3dBaseReader, PointInputFileReader, ABC):
@@ -364,7 +361,7 @@ class _EzC3dPointReader(_EzC3dBaseReader, PointInputFileReader, ABC):
         """
         return self._c3d["parameters"]["POINT"]["LABELS"]["value"]
 
-    def _get_indicies_point_type(self, type: str) -> list[str]:
+    def _get_indicies_point_type(self, type: str) -> list[int]:
         """
         Returns a list of indices corresponding to the points of the given
         type.
@@ -644,3 +641,13 @@ class EzC3dFileHandler(_EzC3dAnalogReader, EventInputFileReader):
                 current_values = current_values.tolist()
             values += current_values
         return values
+
+
+class TrcPointInputFileReader(_BaseInputFileReader):
+
+    def __init__(self, file_path: PurePath):
+        self.analogs = pyomeca.Analogs.from_mot(Path(file_path))
+        super().__init__(file_path)
+
+    def get_size(self):
+        return self.analogs.shape
