@@ -4,3 +4,5 @@ dist
 .idea
 .pixi
 out
+/gaitalytics/__pycache__
+/tests/__pycache__
