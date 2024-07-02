@@ -13,12 +13,13 @@ dependencies = ["pandas", "numpy", "h5py"]
 [tool.setuptools_scm]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov"]
-build = ["twine"]
+test = ["pytest", "pytest-cov", "cleanpy"]
+build = ["twine", "setuptools", "setuptools_scm", "build", "cleanpy"]
+docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
 
 [tool.pixi.project]
 channels = ["conda-forge", "opensim-org"]
-platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+platforms = ["win-64"]
 
 [tool.pixi.pypi-dependencies]
 gaitalytics = { path = ".", editable = true }
@@ -33,11 +34,19 @@ pixi-pycharm = ">=0.0.6,<0.1"
 default = { solve-group = "default" }
 test = { features = ["test"], solve-group = "default" }
 build = { features = ["build"], solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
+dev = { solve-group = "test" }
+
+[tool.pixi.feature.docs.tasks]
+clean-docs = "cleanpy --include-builds --exclude .pixi ."
+docs = "sphinx-build -M html ./docs ./docs/_build -W --keep-going"
 
 [tool.pixi.feature.test.tasks]
+clean-test = "cleanpy --include-testing --exclude .pixi ."
 test = "pytest -vv --cov=gaitalytics"
 
 [tool.pixi.feature.build.tasks]
+clean-build = "cleanpy --include-builds --include-metadata --exclude .pixi ."
 build = "python -m build"
 
 [tool.setuptools.packages.find]
