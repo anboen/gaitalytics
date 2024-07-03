@@ -7,3 +7,4 @@ out
 /gaitalytics/__pycache__
 /tests/__pycache__
 _build
+htmlcov

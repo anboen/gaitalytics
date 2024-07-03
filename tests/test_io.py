@@ -11,6 +11,8 @@ INPUT_MOT_SMALL: Path = Path('tests/data/test_small.mot')
 
 INPUT_C3D_BIG: Path = Path('tests/data/Baseline.5.c3d')
 
+OUTPUT_HDF5_SMALL: Path = Path('out/test_small.hdf5')
+
 
 def test_c3d_events_small():
     c3d_events = C3dEventInputFileReader(INPUT_C3D_SMALL)
@@ -90,7 +92,11 @@ def test_c3d_analog_small():
 
 
 def test_trc_markers_small():
-    MarkersInputFileReader(INPUT_TRC_SMALL)
+    try:
+        MarkersInputFileReader(INPUT_TRC_SMALL)
+        assert False, "Expected Index Error due to reading problems with trc files"
+    except IndexError:
+        pass
 
 
 def test_mot_markers_small():

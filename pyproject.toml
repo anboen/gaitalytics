@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gaitalytics"
 dynamic = ["version"]
-description = "Add a short description here"
+description = "easy gait-metrics for everyone"
 authors = [{name = "André Böni", email = "andre.boeni@llui.org"}]
 requires-python = ">= 3.12"
-dependencies = []
+dependencies = ["netcdf4", "pandas", "tables", "h5py"]
 
 [tool.setuptools_scm]
 
@@ -42,7 +42,7 @@ docs = "sphinx-build -M html ./docs ./docs/_build -W --keep-going"
 
 [tool.pixi.feature.test.tasks]
 clean-test = "cleanpy --include-testing --exclude .pixi ."
-test = "pytest -vv --cov=gaitalytics --capture=sys"
+test = "pytest -vv --cov=gaitalytics --cov-report=term-missing --capture=sys"
 mypy = "mypy gaitalytics"
 
 [tool.pixi.feature.build.tasks]

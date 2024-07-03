@@ -8,6 +8,7 @@ import pyomeca
 import xarray as xr
 
 
+# Input Section
 class _BaseInputFileReader(ABC):
     """
     Base class for input file readers.
@@ -261,3 +262,6 @@ class AnalogsInputFileReader(_PyomecaInputFileReader):
             xr.DataArray: An xarray DataArray containing the analog data.
         """
         return self.data
+
+# Event to C3d Section
+# TODO: Add c3d event writer
