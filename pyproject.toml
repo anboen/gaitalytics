@@ -7,8 +7,8 @@ name = "gaitalytics"
 dynamic = ["version"]
 description = "Add a short description here"
 authors = [{name = "André Böni", email = "andre.boeni@llui.org"}]
-requires-python = ">= 3.11.0, < 3.12.0"
-dependencies = ["numpy", "h5py"]
+requires-python = ">= 3.12"
+dependencies = []
 
 [tool.setuptools_scm]
 
@@ -25,10 +25,9 @@ platforms = ["win-64"]
 gaitalytics = { path = ".", editable = true }
 
 [tool.pixi.dependencies]
-pixi-pycharm = ">=0.0.6,<0.1"
-ezc3d = ">=1.5.10,<1.6"
 pyomeca = ">=2021.0.1,<2021.1"
-python-dateutil = ">=2.9.0,<2.10"
+pixi-pycharm = ">=0.0.6,<0.1"
+
 
 # Environments
 [tool.pixi.environments]
@@ -36,7 +35,6 @@ default = { solve-group = "default" }
 test = { features = ["test"], solve-group = "default" }
 build = { features = ["build"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
-dev = { solve-group = "test" }
 
 [tool.pixi.feature.docs.tasks]
 clean-docs = "cleanpy --include-builds --exclude .pixi ."
@@ -44,7 +42,7 @@ docs = "sphinx-build -M html ./docs ./docs/_build -W --keep-going"
 
 [tool.pixi.feature.test.tasks]
 clean-test = "cleanpy --include-testing --exclude .pixi ."
-test = "pytest -vv --cov=gaitalytics"
+test = "pytest -vv --cov=gaitalytics --capture=sys"
 mypy = "mypy gaitalytics"
 
 [tool.pixi.feature.build.tasks]
