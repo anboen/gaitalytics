@@ -88,10 +88,12 @@ def trial_from_hdf5(file_path: Path) -> Trial:
 
     trial = Trial()
 
-    with h5py.File(str(file_path), 'r') as f:
+    with h5py.File(str(file_path), mode='r') as f:
+
         for category in DataCategory:
             if category.value in f.keys():
-                trial.add_data(category, xr.load_dataarray(file_path, group=category.value))
+                with xr.load_dataarray(file_path, group=category.value) as group:
+                    trial.add_data(category, group)
                 correct_file_format = True
 
         if "events" in f.keys():
