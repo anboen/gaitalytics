@@ -434,6 +434,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/e0/a9/023730ba63db1e494a271cb018dcd361bd2c917ba7004c3e49d5daf795a2/py_cpuinfo-9.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4e/e7/81ebdd666d3bff6670d27349b5053605d83d55548e6bd5711f3b0ae7dd23/pytest-8.2.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/78/3a/af5b4fa5961d9a1e6237b530eb87dd04aea6eb83da09d2a4073d81b54ccf/pytest_cov-5.0.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/48/05/04bf25784ba73abf0e639065fd7a785c005c895c4bf64aa2729d26a1984f/ruff-0.5.0-py3-none-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/8b/84/93dd082a991c36f3e55e170cb71c4011256e45549c0a3b0d3693cf9053e3/tables-3.9.2-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/e8/8d/f5dc5239d59bb4a7b58e2b6d0dc6f2c2ba797b110f83cdda8479508c63dd/types_pytz-2024.1.0.20240417-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/26/9f/ad63fc0248c5379346306f8668cda6e2e2e9c95e01216d2b8ffd9ff037d0/typing_extensions-4.12.2-py3-none-any.whl
@@ -776,9 +777,9 @@ packages:
   timestamp: 1694616398888
 - kind: pypi
   name: gaitalytics
-  version: 0.1.dev11+ge286f5f.d20240704
+  version: 0.1.dev12+gc43f04a.d20240704
   path: .
-  sha256: dd9d17e8589fef9b2d4974f9a8c19e0a2a5dc72c95f54e4ddc3db01d56e724af
+  sha256: d2a03d0ed4c32de50ec0f2953c16f7811a5e0f8a048199cd5d4ca599c9127e10
   requires_dist:
   - netcdf4
   - pandas
@@ -799,6 +800,7 @@ packages:
   - mypy ; extra == 'test'
   - pip ; extra == 'test'
   - pandas-stubs ; extra == 'test'
+  - ruff ; extra == 'test'
   requires_python: '>=3.12'
   editable: true
 - kind: pypi
@@ -2158,6 +2160,12 @@ packages:
   - pygments>=2.13.0,<3.0.0
   - typing-extensions>=4.0.0,<5.0 ; python_version < '3.9'
   requires_python: '>=3.7.0'
+- kind: pypi
+  name: ruff
+  version: 0.5.0
+  url: https://files.pythonhosted.org/packages/48/05/04bf25784ba73abf0e639065fd7a785c005c895c4bf64aa2729d26a1984f/ruff-0.5.0-py3-none-win_amd64.whl
+  sha256: e9118f60091047444c1b90952736ee7b1792910cab56e9b9a9ac20af94cd0440
+  requires_python: '>=3.7'
 - kind: conda
   name: scipy
   version: 1.14.0

@@ -3,7 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from gaitalytics.io import C3dEventInputFileReader, MarkersInputFileReader, AnalogsInputFileReader
+from gaitalytics.io import C3dEventInputFileReader, MarkersInputFileReader, \
+    AnalogsInputFileReader
 
 INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
 INPUT_TRC_SMALL: Path = Path('tests/data/test_small.trc')
@@ -91,11 +92,8 @@ def test_c3d_analog_small():
 
 
 def test_trc_markers_small():
-    try:
+    with pytest.raises(NotImplementedError):
         MarkersInputFileReader(INPUT_TRC_SMALL)
-        assert False, "Expected Index Error due to reading problems with trc files"
-    except NotImplementedError:
-        pass
 
 
 def test_mot_markers_small():
@@ -117,16 +115,10 @@ def test_mot_markers_small():
 
 
 def test_sto_analogs_small():
-    try:
+    with pytest.raises(NotImplementedError):
         AnalogsInputFileReader(INPUT_STO_SMALL)
-        assert False, "Expected Index Error due to reading problems with sto files"
-    except NotImplementedError:
-        pass
 
 
 def test_wrong_file_format():
-    try:
+    with pytest.raises(ValueError):
         MarkersInputFileReader(Path("foo.csv"))
-        assert False, "Expected an unsupported file extension exception"
-    except ValueError as e:
-        pass

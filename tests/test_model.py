@@ -5,7 +5,8 @@ import h5py
 import pytest
 import xarray as xr
 
-from gaitalytics.io import MarkersInputFileReader, AnalogsInputFileReader, C3dEventInputFileReader
+from gaitalytics.io import MarkersInputFileReader, AnalogsInputFileReader, \
+    C3dEventInputFileReader
 from gaitalytics.model import DataCategory, Trial, SegmentedTrial, trial_from_hdf5
 from gaitalytics.segmentation import GaitEventsSegmentation
 
@@ -121,27 +122,21 @@ class TestTrial:
         assert rec_value == exp_value, f"Expected {exp_value} markers, got {rec_value}"
 
     def test(self, trial_small):
-
         rec_value = len(trial_small.get_all_data())
         exp_value = 2
         assert rec_value == exp_value, f"Expected {exp_value} data categories, got {rec_value}"
 
     def test_save_empty_to_hdf5(self, output_file_path_small):
         trial = Trial()
-        try:
+        with pytest.raises(ValueError):
             trial.to_hdf5(output_file_path_small)
-            assert False, "Expected an exception when saving an empty trial"
-        except ValueError:
-            pass
+
         assert not output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"
 
     def test_save_to_existing_hdf5(self, trial_small, output_file_path_small):
         trial_small.to_hdf5(output_file_path_small)
-        try:
+        with pytest.raises(FileExistsError):
             trial_small.to_hdf5(output_file_path_small)
-            assert False, "Expected an exception when saving to an existing file"
-        except FileExistsError:
-            pass
 
     def test_save_to_hdf5(self, trial_small, output_file_path_small):
         trial_small.to_hdf5(output_file_path_small)
@@ -187,15 +182,17 @@ class TestTrial:
         assert loaded_trial.events is not None, "Expected events to be loaded, but they are not"
         del loaded_trial
 
+    def test_save_to_folder(self, trial_small, output_path_small):
+        with pytest.raises(ValueError):
+            trial_small.to_hdf5(output_path_small)
+
 
 class TestSegmentedTrial:
     def test_empy(self, output_path_small):
         trial = SegmentedTrial()
-        try:
+        with pytest.raises(ValueError):
             trial.to_hdf5(output_path_small)
-            assert False, "Expected an exception when saving an empty trial"
-        except ValueError:
-            pass
+
         assert not output_path_small.exists(), f"Expected {output_path_small} to exist, but it does not"
 
     def test_to_hdf5_small(self, trial_small, output_path_small):
@@ -226,3 +223,8 @@ class TestSegmentedTrial:
     def test_file_not_found(self):
         with pytest.raises(FileNotFoundError):
             trial_from_hdf5(Path("foo.hdf5"))
+
+    def test_save_segment_in_file(self, trial_small, output_file_path_small):
+        segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
+        with pytest.raises(ValueError):
+            segments.to_hdf5(output_file_path_small)
