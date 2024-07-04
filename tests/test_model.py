@@ -222,3 +222,7 @@ class TestSegmentedTrial:
         segments.to_hdf5(output_path_small)
         trial = trial_from_hdf5(output_path_small)
         assert output_path_small.exists(), f"Expected {output_path_small} to exist, but it does not"
+
+    def test_file_not_found(self):
+        with pytest.raises(FileNotFoundError):
+            trial_from_hdf5(Path("foo.hdf5"))

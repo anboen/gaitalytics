@@ -13,7 +13,7 @@ dependencies = ["netcdf4", "pandas", "tables", "h5py"]
 [tool.setuptools_scm]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "cleanpy", "mypy"]
+test = ["pytest", "pytest-cov", "cleanpy", "mypy", "pip", "pandas-stubs"]
 build = ["twine", "setuptools", "setuptools_scm", "build", "cleanpy"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints", "sphinx_github_changelog"]
 
@@ -43,7 +43,7 @@ docs = "sphinx-build -M html ./docs ./docs/_build -W --keep-going"
 [tool.pixi.feature.test.tasks]
 clean-test = "cleanpy --include-testing --exclude .pixi ."
 test = "pytest -vv --cov=gaitalytics --cov-report=term-missing --capture=sys"
-mypy = "mypy gaitalytics"
+mypy = "mypy gaitalytics --check-untyped-defs"
 
 [tool.pixi.feature.build.tasks]
 clean-build = "cleanpy --include-builds --include-metadata --exclude .pixi ."

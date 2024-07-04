@@ -37,6 +37,11 @@ def big_trial(request):
 
 class TestEventSegmentation:
 
+    def test_empty_events(self, small_trial):
+        small_trial.events = None
+        with pytest.raises(ValueError):
+            GaitEventsSegmentation("Foot Strike").segment(small_trial)
+
     def test_get_times_small(self, small_trial):
         segmentation = GaitEventsSegmentation("Foot Strike")
         contexts_events = segmentation._get_times_of_events(small_trial.events)

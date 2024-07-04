@@ -9,7 +9,7 @@ import gaitalytics.model as model
 
 class _BaseSegmentation(ABC):
     @abstractmethod
-    def segment(self, trial: model.Trial) -> dict[str, any]:
+    def segment(self, trial: model.Trial) -> model.BaseTrial:
         """
         Segments the trial data based on the segmentation method.
 
@@ -104,7 +104,7 @@ class GaitEventsSegmentation(_BaseSegmentation):
         return trial_segment
 
     @staticmethod
-    def _segment_events(events: pd.DataFrame, start_time: float, end_time: float) -> pd.DataFrame:
+    def _segment_events(events: pd.DataFrame | None, start_time: float, end_time: float) -> pd.DataFrame:
         """
         Segments the events based on the start and end times.
 
@@ -116,6 +116,9 @@ class GaitEventsSegmentation(_BaseSegmentation):
         Returns:
             pd.DataFrame: A DataFrame containing the segmented events.
         """
+        if events is None:
+            raise ValueError("Events are not set.")
+
         return events[(events[io.EventInputFileReader.COLUMN_TIME] > start_time) &
                       (events[io.EventInputFileReader.COLUMN_TIME] < end_time)]
 

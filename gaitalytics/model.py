@@ -61,12 +61,12 @@ class Trial(BaseTrial):
         self._events: pd.DataFrame | None = None
 
     @property
-    def events(self) -> pd.DataFrame:
+    def events(self) -> pd.DataFrame | None:
         """
         Gets the events in the trial.
 
         Returns:
-            pd.DataFrame: A pandas DataFrame containing the events.
+            pd.DataFrame: A pandas DataFrame containing the events if present.
         """
         return self._events
 
@@ -283,7 +283,7 @@ def _load_segmented_trial_file(file_path: Path) -> SegmentedTrial:
     context_segments = SegmentedTrial()
 
     for file in file_path.glob("**/*.h5"):
-        with h5py.File(str(file), mode='r') as f:
+        with h5py.File(str(file), 'r') as f:
             cycle_id = file.name.replace(".h5", "")
             for context in f.keys():
                 if context not in context_segments.get_all_segments():
@@ -302,7 +302,7 @@ def _load_trial_file(file_path):
     # Check if at least one of the entities groups is present in the file
     correct_file_format = False
 
-    with h5py.File(str(file_path), mode='r') as f:
+    with h5py.File(str(file_path), 'r') as f:
         trial = _load_trial(correct_file_format, f, file_path)
 
     return trial
