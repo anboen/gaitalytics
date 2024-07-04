@@ -6,12 +6,11 @@ import pytest
 from gaitalytics.io import C3dEventInputFileReader, MarkersInputFileReader, AnalogsInputFileReader
 
 INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
-INPUT_TRC_SMALL: Path = Path('tests/data/test_small_mokka.trc')
+INPUT_TRC_SMALL: Path = Path('tests/data/test_small.trc')
 INPUT_MOT_SMALL: Path = Path('tests/data/test_small.mot')
+INPUT_STO_SMALL: Path = Path('tests/data/test_small.sto')
 
-INPUT_C3D_BIG: Path = Path('tests/data/Baseline.5.c3d')
-
-OUTPUT_HDF5_SMALL: Path = Path('out/test_small.hdf5')
+INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
 
 
 def test_c3d_events_small():
@@ -95,7 +94,7 @@ def test_trc_markers_small():
     try:
         MarkersInputFileReader(INPUT_TRC_SMALL)
         assert False, "Expected Index Error due to reading problems with trc files"
-    except IndexError:
+    except NotImplementedError:
         pass
 
 
@@ -115,6 +114,14 @@ def test_mot_markers_small():
     exp_value = 2.48
     rec_value = analogs.coords['time'][0]
     assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value}"
+
+
+def test_sto_analogs_small():
+    try:
+        AnalogsInputFileReader(INPUT_STO_SMALL)
+        assert False, "Expected Index Error due to reading problems with sto files"
+    except NotImplementedError:
+        pass
 
 
 def test_wrong_file_format():

@@ -49,11 +49,10 @@ class EventInputFileReader(_BaseInputFileReader):
     @abstractmethod
     def get_events(self) -> pd.DataFrame:
         """
-        Gets the events from the input file.
+        Gets the events from the input file sorted by time.
 
         Returns:
-            list: A list of events.
-
+            pd.DataFrame: A DataFrame containing the events.
         """
         pass
 
@@ -78,6 +77,12 @@ class C3dEventInputFileReader(EventInputFileReader):
         super().__init__(file_path)
 
     def get_events(self) -> pd.DataFrame:
+        """
+       Gets the events from the input file sorted by time.
+
+       Returns:
+           pd.DataFrame: A DataFrame containing the events.
+       """
         labels = self._get_event_labels()
         times = self._get_event_times()
         contexts = self._get_event_contexts()
@@ -88,7 +93,8 @@ class C3dEventInputFileReader(EventInputFileReader):
             self.COLUMN_CONTEXT: contexts,
             self.COLUMN_ICON: icons
         })
-        return table.sort_values(by=self.COLUMN_TIME, ignore_index=True, ascending=True)
+        table = table.sort_values(by=self.COLUMN_TIME, ascending=True)
+        return table
 
     def _get_event_labels(self) -> list[str]:
         """
@@ -185,19 +191,18 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
         if file_ext == 'c3d' and (pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers):
             data = pyomeca_class.from_c3d(file_path)
         elif file_ext == 'trc' and pyomeca_class == pyomeca.Markers:
-            data = pyomeca_class.from_trc(file_path, pandas_kwargs={"sep": "\t", "index_col": False})
+            raise NotImplementedError("TRC file format is not supported for markers")
         elif file_ext == 'mot' and pyomeca_class == pyomeca.Analogs:
-
             data = pyomeca_class.from_mot(file_path, pandas_kwargs={"sep": "\t", "index_col": False})
         elif file_ext == 'sto' and pyomeca_class == pyomeca.Analogs:
-            data = pyomeca_class.from_sto(file_path)
+            raise NotImplementedError("STO file format is not supported for analogs")
         else:
             raise ValueError(f"Unsupported file extension: {file_ext} for class {pyomeca_class}")
         try:
             first_frame = data.attrs["first_frame"]
             frame_rate = data.attrs["rate"]
             data = self._to_absolute_time(data, first_frame, frame_rate)
-        except KeyError as e:
+        except KeyError:
             pass
         finally:
             self.data = data
