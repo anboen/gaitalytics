@@ -175,9 +175,9 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
     This class provides a common interface for reading input files with pyomeca.
     """
 
-    def __init__(self,
-                 file_path: Path,
-                 pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]):
+    def __init__(
+        self, file_path: Path, pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
+    ):
         """Initializes a new instance of the MarkersInputFileReader class.
 
         Determines the file format and uses the appropriate pyomeca class
@@ -191,7 +191,7 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
         """
         file_ext = file_path.name.split(".")[-1]
         if file_ext == "c3d" and (
-                pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
+            pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
         ):
             data = pyomeca_class.from_c3d(file_path)
         elif file_ext == "trc" and pyomeca_class == pyomeca.Markers:
@@ -217,7 +217,7 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
 
     @staticmethod
     def _to_absolute_time(
-            data: xr.DataArray, first_frame: int, rate: float
+        data: xr.DataArray, first_frame: int, rate: float
     ) -> xr.DataArray:
         first_frame = first_frame
         data.coords["time"] = data.coords["time"] + (first_frame * 1 / rate)
@@ -270,6 +270,7 @@ class AnalogsInputFileReader(_PyomecaInputFileReader):
             xr.DataArray: An xarray DataArray containing the analog data.
         """
         return self.data
+
 
 # Event to C3d Section
 # TODO: Add c3d event writer

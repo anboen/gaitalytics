@@ -1,4 +1,5 @@
 """This module provides classes for structuring, storing and loading trial data."""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from pathlib import Path
@@ -15,8 +16,8 @@ class DataCategory(Enum):
 
 
     Attributes:
-        MARKERS (str): The markers category.
-        ANALOGS (str): The analogs category.
+        MARKERS (str): The marker's category.
+        ANALOGS (str): The analog's category.
     """
 
     MARKERS = "markers"
@@ -28,6 +29,7 @@ class BaseTrial(ABC):
 
     This class provides a common interface for trials to load and save data.
     """
+
     @abstractmethod
     def _to_hdf5(self, file_path: Path, base_group: str | None = None):
         """Local implementation of the to_hdf5 method.
@@ -74,6 +76,7 @@ class Trial(BaseTrial):
 
     A trial is a collection of data arrays (typically markers & analogs) and events.
     """
+
     def __init__(self):
         """Initializes a new instance of the Trial class."""
         self._data: dict[DataCategory, xr.DataArray] = {}
@@ -323,7 +326,7 @@ def _load_trial(correct_file_format, group, file_path):
     for category in DataCategory:
         if category.value in group.keys():
             with xr.load_dataarray(
-                    file_path, group=f"{group.name}/{category.value}"
+                file_path, group=f"{group.name}/{category.value}"
             ) as data:
                 trial.add_data(category, data)
 

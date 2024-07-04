@@ -3,6 +3,7 @@
 The module provides classes for segmenting the trial data based on
 gait events as well as a base class to implement additional methods.
 """
+
 from abc import ABC, abstractmethod
 
 import pandas as pd
@@ -85,22 +86,22 @@ class GaitEventsSegmentation(_BaseSegmentation):
         splits = {}
         interesting_events = events[
             events[io.EventInputFileReader.COLUMN_LABEL] == self.event_label
-            ]
+        ]
         contexts = events[io.EventInputFileReader.COLUMN_CONTEXT].unique()
         for context in contexts:
             context_events = interesting_events[
                 interesting_events[io.EventInputFileReader.COLUMN_CONTEXT] == context
-                ]
+            ]
             splits[context] = context_events[io.EventInputFileReader.COLUMN_TIME].values
         return splits
 
     def _get_segment(
-            self,
-            trial: model.Trial,
-            start_time: float,
-            end_time: float,
-            cycle_id: int,
-            context: str,
+        self,
+        trial: model.Trial,
+        start_time: float,
+        end_time: float,
+        cycle_id: int,
+        context: str,
     ) -> model.Trial:
         """Segments the trial data based on the start and end times.
 
@@ -126,7 +127,7 @@ class GaitEventsSegmentation(_BaseSegmentation):
 
     @staticmethod
     def _segment_events(
-            events: pd.DataFrame | None, start_time: float, end_time: float
+        events: pd.DataFrame | None, start_time: float, end_time: float
     ) -> pd.DataFrame:
         """Segments the events based on the start and end times.
 
@@ -144,7 +145,7 @@ class GaitEventsSegmentation(_BaseSegmentation):
         return events[
             (events[io.EventInputFileReader.COLUMN_TIME] > start_time)
             & (events[io.EventInputFileReader.COLUMN_TIME] < end_time)
-            ]
+        ]
 
     @staticmethod
     def _update_attrs(segment: xr.DataArray, cycle_id: int, context: str):

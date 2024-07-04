@@ -1,4 +1,5 @@
 """This module provides classes for batch normalisation of gait data in a trial."""
+
 from abc import ABC, abstractmethod
 
 import gaitalytics.model as model
@@ -62,8 +63,9 @@ class LinearTimeNormaliser(BaseNormaliser):
             new_trial.add_data(data_category, norm_data)
         return new_trial
 
-    def _normalise_segmented_trial(self,
-                                   trial: model.BaseTrial) -> model.SegmentedTrial:
+    def _normalise_segmented_trial(
+        self, trial: model.BaseTrial
+    ) -> model.SegmentedTrial:
         segments = model.SegmentedTrial()
         for key, segment in trial.get_all_segments().items():
             segments.add_segment(key, self.normalise(segment))
