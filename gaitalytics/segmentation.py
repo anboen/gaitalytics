@@ -15,7 +15,7 @@ import gaitalytics.model as model
 
 class _BaseSegmentation(ABC):
     @abstractmethod
-    def segment(self, trial: model.Trial) -> model.BaseTrial:
+    def segment(self, trial: model.Trial) -> model.TrialCycles:
         """Segments the trial data based on the segmentation method.
 
         Args:
@@ -39,14 +39,14 @@ class GaitEventsSegmentation(_BaseSegmentation):
         """
         self.event_label = event_label
 
-    def segment(self, trial: model.Trial) -> model.SegmentedTrial:
+    def segment(self, trial: model.Trial) -> model.TrialCycles:
         """Segments the trial data based on gait events and contexts.
 
         Args:
             trial (model.Trial): The trial to be segmented.
 
         Returns:
-            model.SegmentedTrial: A new trial containing the segmented data.
+            model.TrialCycles: A new trial containing the all the cycles.
 
         Raises:
             ValueError: If the trial does not have events.
@@ -57,19 +57,18 @@ class GaitEventsSegmentation(_BaseSegmentation):
 
         events_times = self._get_times_of_events(events)
 
-        context_segments = model.SegmentedTrial()
+        trial_cycles = model.TrialCycles()
         for context, times in events_times.items():
-            cycle_segments = model.SegmentedTrial()
             for cycle_id in range(len(times) - 1):
                 start_time = times[cycle_id]
                 end_time = times[cycle_id + 1]
-                cycle_segments.add_segment(
-                    str(cycle_id),
+                trial_cycles.add_cycle(
+                    context,
+                    cycle_id,
                     self._get_segment(trial, start_time, end_time, cycle_id, context),
                 )
-            context_segments.add_segment(context, cycle_segments)
 
-        return context_segments
+        return trial_cycles
 
     def _get_times_of_events(self, events: pd.DataFrame) -> dict[str, list]:
         """Gets the times of the events in the trial.
@@ -167,3 +166,5 @@ class GaitEventsSegmentation(_BaseSegmentation):
         segment.attrs["end_frame"] = end_frame
         segment.attrs["cycle_id"] = cycle_id
         segment.attrs["context"] = context
+        # netcdf can not handle booleans :(
+        segment.attrs["used"] = 1

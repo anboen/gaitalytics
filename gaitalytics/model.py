@@ -58,14 +58,18 @@ class BaseTrial(ABC):
             ValueError: If the trial is a trial and the file path is a folder.
         """
         if file_path.exists():
-            raise FileExistsError(f"File {file_path} already exists.")
-        elif type(self) is SegmentedTrial and file_path.suffix:
+            raise FileExistsError(f"{file_path} already exists.")
+        elif type(self) is TrialCycles and file_path.suffix:
             raise ValueError("Cannot save a segmented trial in a single file.")
         elif type(self) is Trial and not file_path.suffix:
             raise ValueError("Cannot save a trial in folder")
 
         paths, data, groups = self._to_hdf5(file_path, base_group)
         if len(data) > 0:
+            if file_path.suffix:
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+            else:
+                file_path.mkdir(parents=True, exist_ok=True)
             xr.save_mfdataset(data, paths, groups=groups, mode="a")
         else:
             raise ValueError("No data to save.")
@@ -158,7 +162,7 @@ class Trial(BaseTrial):
         groups = []
         data = []
         paths = []
-
+        # Gather all data
         if self.get_all_data() is not None and len(self.get_all_data()) > 0:
             groups += [
                 f"{base_group}{category.value}"
@@ -175,40 +179,59 @@ class Trial(BaseTrial):
         return paths, data, groups
 
 
-class SegmentedTrial(BaseTrial):
+class TrialCycles(BaseTrial):
     """Represents a segmented trial."""
 
     def __init__(self):
         """Initializes a new instance of the SegmentedTrial class."""
-        self._segments: dict[str, BaseTrial] = {}
+        self._cycles: dict[str, dict[int, Trial]] = {}
 
-    def add_segment(self, key: str, segment: BaseTrial):
-        """Adds a segment to the segmented trial.
-
-        Args:
-            key (str): The key of the segment.
-            segment (BaseTrial): The segment to be added.
-        """
-        self._segments[key] = segment
-
-    def get_segment(self, key: str) -> BaseTrial:
-        """Gets a segment from the segmented trial.
+    def add_cycle(self, context: str, cycle_id: int, segment: Trial):
+        """Adds a Cycle to the segmented trial.
 
         Args:
-            key (str): The key of the segment.
+            context (str): The context of the cycle.
+            cycle_id (int): The id of the cycle.
+            segment (Trial): The segment to be added.
+        """
+        if context not in self._cycles.keys():
+            self._cycles[context] = {}
+
+        self._cycles[context][cycle_id] = segment
+
+    def get_cycle(self, context: str, cycle_id: int) -> Trial:
+        """Gets a cycle from the segmented trial.
+
+        Args:
+            context (str): The context of the cycle.
+            cycle_id (int): The id of the cycle.
+
+        Raises:
+            KeyError: If the cycle does not exist.
+        """
+        return self._cycles[context][cycle_id]
+
+    def get_all_cycles(self) -> dict[str, dict[int, Trial]]:
+        """Gets all cycles from the segmented trial.
 
         Returns:
-            BaseTrial: The segment.
+            dict[str, dict[int, Trial]: A nexted dictionary containing the cycles.
+                Whereas the key of the first dictionary is the context and the second
+                key is the cycle number.
         """
-        return self._segments[key]
+        return self._cycles
 
-    def get_all_segments(self) -> dict[str, BaseTrial]:
-        """Gets all segments from the segmented trial.
+    def get_cycles_per_context(self, context: str) -> dict[int, Trial]:
+        """Gets all cycles from the segmented trial for a specific context.
+
+        Args:
+            context (str): The context of the cycles.
 
         Returns:
-            dict[str, BaseTrial]: A dictionary containing the segments.
+            dict[int, Trial]: A dictionary containing the cycles
+                for the specified context.
         """
-        return self._segments
+        return self._cycles[context]
 
     def _to_hdf5(self, file_path: Path, base_group: str | None = None):
         """Recursively saves the segmented trial data to an HDF5 file.
@@ -243,31 +266,22 @@ class SegmentedTrial(BaseTrial):
                 Default = None
         """
         if base_group is None:
-            base_group = ""
-        else:
-            base_group = f"{base_group}/"
+            base_group = "/"
 
         groups = []
         data = []
         paths = []
 
-        for key, segment in self.get_all_segments().items():
-            if file_path.name.split(".")[-1] != "h5":
-                file_path.mkdir(parents=True, exist_ok=True)
-
-            new_file = file_path
-            new_base_group = base_group
-            if type(segment) is Trial:
-                new_file = (new_file / key).with_suffix(".h5")
-            elif type(segment) is SegmentedTrial:
-                new_base_group = f"{base_group}{key}"
-
-            seg_groups, seg_data, seg_path = segment._to_hdf5(
-                new_file, base_group=f"{new_base_group}"
-            )
-            groups += seg_groups
-            data += seg_data
-            paths += seg_path
+        for context, cycles in self.get_all_cycles().items():
+            for cycle_id, cycle in cycles.items():
+                new_file = (file_path / f"{cycle_id}").with_suffix(".h5")
+                new_base_group = f"{base_group}{context}/"
+                seg_path, seg_data, seg_groups = cycle._to_hdf5(
+                    new_file, base_group=new_base_group
+                )
+                groups += seg_groups
+                data += seg_data
+                paths += seg_path
 
         return paths, data, groups
 
@@ -291,37 +305,34 @@ def trial_from_hdf5(file_path: Path) -> Trial:
     return trial
 
 
-def _load_segmented_trial_file(file_path: Path) -> SegmentedTrial:
-    context_segments = SegmentedTrial()
+def _load_segmented_trial_file(file_path: Path) -> TrialCycles:
+    trial_cycles = TrialCycles()
 
     for file in file_path.glob("**/*.h5"):
         with h5py.File(str(file), "r") as f:
             cycle_id = file.name.replace(".h5", "")
             for context in f.keys():
-                if context not in context_segments.get_all_segments():
-                    context_segments.add_segment(context, SegmentedTrial())
-
-                trial = _load_trial(False, f[context], file)
-                context_segments.get_segment(context).add_segment(cycle_id, trial)
-    return context_segments
+                trial = _load_trial(f[context], file)
+                trial_cycles.add_cycle(context, int(cycle_id), trial)
+    return trial_cycles
 
 
-def _load_trial_file(file_path):
+def _load_trial_file(file_path) -> Trial:
     """Loads a trial from an HDF5 file.
 
     Args:
         file_path (Path): The path to the HDF5 file.
     """
     # Check if at least one of the entities groups is present in the file
-    correct_file_format = False
 
     with h5py.File(str(file_path), "r") as f:
-        trial = _load_trial(correct_file_format, f, file_path)
+        trial = _load_trial(f, file_path)
 
     return trial
 
 
-def _load_trial(correct_file_format, group, file_path):
+def _load_trial(group, file_path):
+    correct_file_format = False
     trial = Trial()
     for category in DataCategory:
         if category.value in group.keys():

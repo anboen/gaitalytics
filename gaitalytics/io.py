@@ -77,11 +77,19 @@ class C3dEventInputFileReader(EventInputFileReader):
 
         Returns:
             pd.DataFrame: A DataFrame containing the events.
+
+        Raises:
+            ValueError: If no events are found in the C3D file.
         """
         labels = self._get_event_labels()
         times = self._get_event_times()
         contexts = self._get_event_contexts()
         icons = self._get_event_icons()
+
+        # Check if there are any events in the C3D file
+        if not (labels and times and contexts and icons):
+            raise ValueError("No events found in the C3D file.")
+
         table = pd.DataFrame(
             {
                 self.COLUMN_TIME: times,

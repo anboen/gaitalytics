@@ -7,7 +7,7 @@ import xarray as xr
 
 from gaitalytics.io import MarkersInputFileReader, AnalogsInputFileReader, \
     C3dEventInputFileReader
-from gaitalytics.model import DataCategory, Trial, SegmentedTrial, trial_from_hdf5
+from gaitalytics.model import DataCategory, Trial, TrialCycles, trial_from_hdf5
 from gaitalytics.segmentation import GaitEventsSegmentation
 
 INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
@@ -189,7 +189,7 @@ class TestTrial:
 
 class TestSegmentedTrial:
     def test_empy(self, output_path_small):
-        trial = SegmentedTrial()
+        trial = TrialCycles()
         with pytest.raises(ValueError):
             trial.to_hdf5(output_path_small)
 
@@ -203,7 +203,7 @@ class TestSegmentedTrial:
 
     def test_to_write_cycle(self, trial_small, output_file_path_small):
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
-        trial: xr.DataArray = segments.get_segment("Left").get_segment("0").get_data(DataCategory.MARKERS)
+        trial: xr.DataArray = segments.get_cycle("Left", 0).get_data(DataCategory.MARKERS)
         trial.to_netcdf(output_file_path_small, group="Left/0/markers")
 
         assert output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"

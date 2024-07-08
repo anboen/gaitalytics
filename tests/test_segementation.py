@@ -2,8 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from gaitalytics.io import MarkersInputFileReader, AnalogsInputFileReader, C3dEventInputFileReader
-from gaitalytics.model import DataCategory, Trial
+from gaitalytics.io import MarkersInputFileReader, AnalogsInputFileReader, \
+    C3dEventInputFileReader
+from gaitalytics.model import DataCategory, Trial, TrialCycles
 from gaitalytics.segmentation import GaitEventsSegmentation
 
 
@@ -46,7 +47,8 @@ class TestEventSegmentation:
         segmentation = GaitEventsSegmentation("Foot Strike")
         contexts_events = segmentation._get_times_of_events(small_trial.events)
 
-        assert len(contexts_events) == 2, f"Expected 2 contexts, got {len(contexts_events)}"
+        assert len(
+            contexts_events) == 2, f"Expected 2 contexts, got {len(contexts_events)}"
 
         rec_value = len(contexts_events["Left"])
         exp_value = 3
@@ -60,15 +62,15 @@ class TestEventSegmentation:
         segmentation = GaitEventsSegmentation("Foot Strike")
         segments = segmentation.segment(small_trial)
 
-        rec_value = len(segments.get_all_segments())
+        rec_value = len(segments.get_all_cycles())
         exp_value = 2
         assert rec_value == exp_value, f"Expected {exp_value} contexts, got {rec_value}"
 
-        rec_value = len(segments.get_segment("Left").get_all_segments())
+        rec_value = len(segments.get_cycles_per_context("Left"))
         exp_value = 2
         assert rec_value == exp_value, f"Expected {exp_value} segments for Left context, got {rec_value}"
 
-        rec_value = len(segments.get_segment("Right").get_all_segments())
+        rec_value = len(segments.get_cycles_per_context("Right"))
         exp_value = 2
         assert rec_value == exp_value, f"Expected {exp_value} segments for Right context, got {rec_value}"
 
@@ -80,15 +82,15 @@ class TestEventSegmentation:
         segmentation = GaitEventsSegmentation("Foot Strike")
         segments = segmentation.segment(big_trial)
 
-        rec_value = len(segments.get_all_segments())
+        rec_value = len(segments.get_all_cycles())
         exp_value = 2
         assert rec_value == exp_value, f"Expected {exp_value} contexts, got {rec_value}"
 
-        rec_value = len(segments.get_segment("Left").get_all_segments())
+        rec_value = len(segments.get_cycles_per_context("Left"))
         exp_value = 215
         assert rec_value == exp_value, f"Expected {exp_value} segments for Left context, got {rec_value}"
 
-        rec_value = len(segments.get_segment("Right").get_all_segments())
+        rec_value = len(segments.get_cycles_per_context("Right"))
         exp_value = 215
         assert rec_value == exp_value, f"Expected {exp_value} segments for Right context, got {rec_value}"
 
@@ -97,14 +99,14 @@ class TestEventSegmentation:
         _test_cycle_id_context(segments)
 
 
-def _test_cycle_id_context(segments):
+def _test_cycle_id_context(segments: TrialCycles):
     # Test cycle_id and context attrs
-    for context, cycle_segments in segments.get_all_segments().items():
-        for cycle_id, cycle in cycle_segments.get_all_segments().items():
+    for context, cycle_segments in segments.get_all_cycles().items():
+        for cycle_id, cycle in cycle_segments.items():
             markers = cycle.get_data(DataCategory.MARKERS)
             analogs = cycle.get_data(DataCategory.ANALOGS)
 
-            rec_value = str(markers.attrs["cycle_id"])
+            rec_value = markers.attrs["cycle_id"]
             exp_value = cycle_id
             message = f"Expected {exp_value} cycle_id, got {rec_value} in {context}: {cycle_id} markers"
             assert rec_value == exp_value, message
@@ -114,7 +116,7 @@ def _test_cycle_id_context(segments):
             message = f"Expected {exp_value} context, got {rec_value} in {context}: {cycle_id} markers"
             assert rec_value == exp_value, message
 
-            rec_value = str(analogs.attrs["cycle_id"])
+            rec_value = analogs.attrs["cycle_id"]
             exp_value = cycle_id
             message = f"Expected {exp_value} cycle_id, got {rec_value} in {context}: {cycle_id} analogs"
             assert rec_value == exp_value, message
@@ -125,24 +127,28 @@ def _test_cycle_id_context(segments):
             assert rec_value == exp_value, message
 
 
-def _test_start_end_frame(segments):
+def _test_start_end_frame(cycles: TrialCycles):
     # Test start end frame attrs
     # If events are not set based on low frame rate frames can overlap
-    for context, cycle_segments in segments.get_all_segments().items():
-        for cycle_id in range(len(cycle_segments.get_all_segments()) - 1):
-            current_trial: Trial = cycle_segments.get_segment(str(cycle_id))
-            next_trial: Trial = cycle_segments.get_segment(str(cycle_id + 1))
+    for context, cycle_segments in cycles.get_all_cycles().items():
+        for cycle_idx in range(len(cycle_segments.keys()) - 1):
+            current_key = list(cycle_segments.keys())[cycle_idx]
+            next_key = list(cycle_segments.keys())[cycle_idx+1]
+            current_trial: Trial = cycle_segments[current_key]
+            next_trial: Trial = cycle_segments[next_key]
 
             current_data = current_trial.get_data(DataCategory.MARKERS)
             next_data = next_trial.get_data(DataCategory.MARKERS)
-            rec_value = abs(next_data.attrs["start_frame"] - current_data.attrs["end_frame"])
+            rec_value = abs(
+                next_data.attrs["start_frame"] - current_data.attrs["end_frame"])
             exp_value = 1
-            message = f"Expected max {exp_value} frame difference, got {rec_value} in {context}: {cycle_id} markers"
+            message = f"Expected max {exp_value} frame difference, got {rec_value} in {context}: {current_key} markers"
             assert rec_value <= exp_value, message
 
             current_data = current_trial.get_data(DataCategory.ANALOGS)
             next_data = next_trial.get_data(DataCategory.ANALOGS)
-            rec_value = abs(next_data.attrs["start_frame"] - current_data.attrs["end_frame"])
+            rec_value = abs(
+                next_data.attrs["start_frame"] - current_data.attrs["end_frame"])
             exp_value = 1
-            message = f"Expected max {exp_value} frame difference, got {rec_value} in {context}: {cycle_id} analogs"
+            message = f"Expected max {exp_value} frame difference, got {rec_value} in {context}: {current_key} analogs"
             assert rec_value <= exp_value, message

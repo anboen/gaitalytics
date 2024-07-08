@@ -12,7 +12,9 @@ class BaseNormaliser(ABC):
     """
 
     @abstractmethod
-    def normalise(self, trial: model.BaseTrial) -> model.BaseTrial:
+    def normalise(
+        self, trial: model.Trial | model.TrialCycles
+    ) -> model.Trial | model.TrialCycles:
         """Normalises the input data.
 
         Args:
@@ -39,7 +41,9 @@ class LinearTimeNormaliser(BaseNormaliser):
         """
         self.n_frames: int = n_frames
 
-    def normalise(self, trial: model.BaseTrial) -> model.BaseTrial:
+    def normalise(
+        self, trial: model.Trial | model.TrialCycles
+    ) -> model.Trial | model.TrialCycles:
         """Normalises the data based on time.
 
         Args:
@@ -48,13 +52,13 @@ class LinearTimeNormaliser(BaseNormaliser):
         Returns:
             model.BaseTrial: A new trial containing the normalised data.
         """
-        if type(trial) is model.SegmentedTrial:
-            trial = self._normalise_segmented_trial(trial)
-        else:
+        if type(trial) is model.TrialCycles:
+            trial = self._normalise_cycle(trial)
+        elif type(trial) is model.Trial:
             trial = self._normalise_trial(trial)
         return trial
 
-    def _normalise_trial(self, trial: model.BaseTrial) -> model.Trial:
+    def _normalise_trial(self, trial: model.Trial) -> model.Trial:
         new_trial = model.Trial()
         for data_category in trial.get_all_data():
             data = trial.get_data(data_category)
@@ -63,11 +67,11 @@ class LinearTimeNormaliser(BaseNormaliser):
             new_trial.add_data(data_category, norm_data)
         return new_trial
 
-    def _normalise_segmented_trial(
-        self, trial: model.BaseTrial
-    ) -> model.SegmentedTrial:
-        segments = model.SegmentedTrial()
-        for key, segment in trial.get_all_segments().items():
-            segments.add_segment(key, self.normalise(segment))
+    def _normalise_cycle(self, trial: model.TrialCycles) -> model.TrialCycles:
+        norm_cycles = model.TrialCycles()
+        for context, cycles in trial.get_all_cycles().items():
+            for cycle_id, cycle in cycles.items():
+                self.normalise(cycle)
+                norm_cycles.add_cycle(context, cycle_id, cycle)
 
-        return segments
+        return norm_cycles

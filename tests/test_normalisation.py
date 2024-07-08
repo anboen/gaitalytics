@@ -5,7 +5,7 @@ import pytest
 
 from gaitalytics.io import MarkersInputFileReader, AnalogsInputFileReader, \
     C3dEventInputFileReader
-from gaitalytics.model import DataCategory, Trial, trial_from_hdf5
+from gaitalytics.model import DataCategory, Trial, trial_from_hdf5, TrialCycles
 from gaitalytics.normalisation import LinearTimeNormaliser
 from gaitalytics.segmentation import GaitEventsSegmentation
 
@@ -76,8 +76,8 @@ class TestLinearTimeNormalisation:
         normaliser = LinearTimeNormaliser()
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
 
-        normalised_trial = normaliser.normalise(segments)
-        cycle = normalised_trial.get_segment("Right").get_segment("0")
+        normalised_trial: TrialCycles = normaliser.normalise(segments)
+        cycle = normalised_trial.get_cycle("Right", 0)
         hip = cycle.get_data(DataCategory.MARKERS).loc["x", "LHipAngles"]
         force = cycle.get_data(DataCategory.ANALOGS).loc["Force.Fx1"]
 
@@ -94,7 +94,7 @@ class TestLinearTimeNormalisation:
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_big)
 
         normalised_trial = normaliser.normalise(segments)
-        cycle = normalised_trial.get_segment("Right").get_segment("0")
+        cycle = normalised_trial.get_cycle("Right", 0)
         hip = cycle.get_data(DataCategory.MARKERS).loc["x", "LHipAngles"]
         force = cycle.get_data(DataCategory.ANALOGS).loc["Force.Fx1"]
 
@@ -114,7 +114,7 @@ class TestLinearTimeNormalisation:
         normaliser = LinearTimeNormaliser()
         normalised_trial = normaliser.normalise(new_trial)
 
-        cycle = normalised_trial.get_segment("Right").get_segment("0")
+        cycle = normalised_trial.get_cycle("Right", 0)
         hip = cycle.get_data(DataCategory.MARKERS).loc["x", "LHipAngles"]
         force = cycle.get_data(DataCategory.ANALOGS).loc["Force.Fx1"]
 
