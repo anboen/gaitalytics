@@ -17,14 +17,14 @@ class _BaseInputFileReader:
     This class provides a common interface for reading input files.
 
     Attributes:
-        file_path (Path): The path to the input file.
+        file_path: The path to the input file.
     """
 
     def __init__(self, file_path: Path):
         """Initialize a new instance of the _BaseInputFileReader class.
 
         Args:
-            file_path (PurePath): The path to the input file.
+            file_path: The path to the input file.
         """
         self.file_path = file_path
 
@@ -49,7 +49,7 @@ class EventInputFileReader(_BaseInputFileReader):
         """Get the events from the input file sorted by time.
 
         Returns:
-            pd.DataFrame: A DataFrame containing the events.
+            A DataFrame containing the events.
         """
         raise NotImplementedError
 
@@ -66,7 +66,7 @@ class C3dEventInputFileReader(EventInputFileReader):
         """Initializes a new instance of the EzC3dFileHandler class.
 
         Args:
-            file_path (Path): The path to the C3D file.
+            file_path: The path to the C3D file.
 
         """
         self._c3d = ezc3d.c3d(str(file_path))
@@ -76,7 +76,7 @@ class C3dEventInputFileReader(EventInputFileReader):
         """Gets the events from the input file sorted by time.
 
         Returns:
-            pd.DataFrame: A DataFrame containing the events.
+            A DataFrame containing the events.
 
         Raises:
             ValueError: If no events are found in the C3D file.
@@ -105,7 +105,7 @@ class C3dEventInputFileReader(EventInputFileReader):
         """Gets the labels of the events in the C3D file.
 
         Returns:
-            list(str): The labels of the events.
+            The labels of the events.
 
         """
         section_base = "LABELS"
@@ -116,7 +116,7 @@ class C3dEventInputFileReader(EventInputFileReader):
         """Returns the event times.
 
         Returns:
-        np.ndarray: An array containing the event times.
+            An array containing the event times.
         """
         section_base = "TIMES"
         return self._concat_sections(section_base)
@@ -125,7 +125,7 @@ class C3dEventInputFileReader(EventInputFileReader):
         """Gets the contexts of the events in the C3D file.
 
         Returns:
-            list: The contexts of the events.
+            The contexts of the events.
 
         """
         section_base = "CONTEXTS"
@@ -135,7 +135,7 @@ class C3dEventInputFileReader(EventInputFileReader):
         """Gets the icons of the events in the C3D file.
 
         Returns:
-            list: The icons of the events.
+            The icons of the events.
         """
         section_base = "ICON_IDS"
         return self._concat_sections(section_base)
@@ -144,10 +144,10 @@ class C3dEventInputFileReader(EventInputFileReader):
         """Gets the sections of the specified type in the C3D file.
 
         Args:
-            section_base (str): The base name of the sections to get.
+            The base name of the sections to get.
 
         Returns:
-            list: A list containing the sections of the specified type.
+            A list containing the sections of the specified type.
         """
         sections = []
         for section in self._c3d["parameters"]["EVENT"].keys():
@@ -155,14 +155,14 @@ class C3dEventInputFileReader(EventInputFileReader):
                 sections.append(section)
         return sections
 
-    def _concat_sections(self, section_base) -> list:
+    def _concat_sections(self, section_base: str) -> list:
         """Concatenates the values of the specified sections in the C3D file.
 
         Args:
-            section_base (str): The base name of the sections to concatenate.
+            section_base: The base name of the sections to concatenate.
 
         Returns:
-            list: A list containing the concatenated values of the sections.
+            A list containing the concatenated values of the sections.
         """
         values: list = []
         for section in self._get_sections(section_base):
@@ -192,8 +192,8 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
         to read the data. Further it converts the data to absolute time if needed.
 
         Args:
-            file_path (Path): The path to the marker data file.
-            pyomeca_class (pymoca.Markers | pyomeca.Analogs):
+            file_path: The path to the marker data file.
+            pyomeca_class:
                 The pyomeca class to use for reading the data.
 
         """
@@ -242,7 +242,7 @@ class MarkersInputFileReader(_PyomecaInputFileReader):
         """Initializes a new instance of the MarkersInputFileReader class.
 
         Args:
-            file_path (Path): The path to the marker data file.
+            file_path: The path to the marker data file.
 
         """
         super().__init__(file_path, pyomeca.Markers)
@@ -251,7 +251,7 @@ class MarkersInputFileReader(_PyomecaInputFileReader):
         """Gets the markers from the input file.
 
         Returns:
-            xr.DataArray: An xarray DataArray containing the markers.
+            An xarray DataArray containing the markers.
         """
         return self.data
 
@@ -266,7 +266,7 @@ class AnalogsInputFileReader(_PyomecaInputFileReader):
         """Initializes a new instance of the AnalogsInputFileReader class.
 
         Args:
-            file_path (Path): The path to the analog data file.
+            file_path: The path to the analog data file.
 
         """
         super().__init__(file_path, pyomeca.Analogs)
@@ -275,7 +275,7 @@ class AnalogsInputFileReader(_PyomecaInputFileReader):
         """Gets the analog data from the input file.
 
         Returns:
-            xr.DataArray: An xarray DataArray containing the analog data.
+            An xarray DataArray containing the analog data.
         """
         return self.data
 

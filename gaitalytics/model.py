@@ -16,12 +16,12 @@ class DataCategory(Enum):
 
 
     Attributes:
-        MARKERS (str): The marker's category.
-        ANALOGS (str): The analog's category.
+        MARKERS: The marker's category.
+        ANALOGS: The analog's category.
     """
 
-    MARKERS = "markers"
-    ANALOGS = "analogs"
+    MARKERS: str = "markers"
+    ANALOGS: str = "analogs"
 
 
 class BaseTrial(ABC):
@@ -35,8 +35,8 @@ class BaseTrial(ABC):
         """Local implementation of the to_hdf5 method.
 
         Args:
-            file_path (Path): The path to the HDF5 file.
-            base_group (str): The base group to save the data.
+            file_path: The path to the HDF5 file.
+            base_group: The base group to save the data.
                 If None, the data will be saved in the root of the file.
                 Default = None
         """
@@ -46,8 +46,8 @@ class BaseTrial(ABC):
         """Saves the trial data to an HDF5 file.
 
         Args:
-            file_path (Path): The path to the HDF5 file.
-            base_group (str): The base group to save the data.
+            file_path: The path to the HDF5 file.
+            base_group: The base group to save the data.
                 If None, the data will be saved in the root of the file.
                 Default = None
 
@@ -92,6 +92,7 @@ class Trial(BaseTrial):
 
         Returns:
             pd.DataFrame: A pandas DataFrame containing the events if present.
+            None: If no events are present.
         """
         return self._events
 
@@ -100,7 +101,7 @@ class Trial(BaseTrial):
         """Sets the events in the trial.
 
         Args:
-            events (pd.DataFrame): The events to be set.
+            events: The events to be set.
         """
         self._events = events
 
@@ -108,8 +109,8 @@ class Trial(BaseTrial):
         """Adds data to the trial.
 
         Args:
-            category (DataCategory): The category of the data.
-            data (xr.DataArray): The data array to be added.
+            category: The category of the data.
+            data: The data array to be added.
         """
         if category in self._data:
             self._data[category] = xr.concat([self._data[category], data], dim="time")
@@ -120,10 +121,10 @@ class Trial(BaseTrial):
         """Gets the data from the trial.
 
         Args:
-            category (DataCategory): The category of the data.
+            category: The category of the data.
 
         Returns:
-            xr.DataArray: The data array.
+            The data array.
         """
         return self._data[category]
 
@@ -131,7 +132,7 @@ class Trial(BaseTrial):
         """Gets all data from the trial.
 
         Returns:
-            dict[DataCategory, xr.DataArray]: A dictionary containing the data arrays.
+            A dictionary containing the data arrays.
         """
         return self._data
 
@@ -149,8 +150,8 @@ class Trial(BaseTrial):
                 - xarray.Dataset
 
         Args:
-            file_path (Path): The path to the HDF5 file.
-            base_group (str): The base group to save the data.
+            file_path: The path to the HDF5 file.
+            base_group: The base group to save the data.
                 If None, the data will be saved in the root of the file.
                 Default = ""
         """
@@ -190,9 +191,9 @@ class TrialCycles(BaseTrial):
         """Adds a Cycle to the segmented trial.
 
         Args:
-            context (str): The context of the cycle.
-            cycle_id (int): The id of the cycle.
-            segment (Trial): The segment to be added.
+            context: The context of the cycle.
+            cycle_id: The id of the cycle.
+            segment: The segment to be added.
         """
         if context not in self._cycles.keys():
             self._cycles[context] = {}
@@ -203,8 +204,8 @@ class TrialCycles(BaseTrial):
         """Gets a cycle from the segmented trial.
 
         Args:
-            context (str): The context of the cycle.
-            cycle_id (int): The id of the cycle.
+            context: The context of the cycle.
+            cycle_id: The id of the cycle.
 
         Raises:
             KeyError: If the cycle does not exist.
@@ -215,9 +216,9 @@ class TrialCycles(BaseTrial):
         """Gets all cycles from the segmented trial.
 
         Returns:
-            dict[str, dict[int, Trial]: A nexted dictionary containing the cycles.
-                Whereas the key of the first dictionary is the context and the second
-                key is the cycle number.
+            A nexted dictionary containing the cycles.
+            Whereas the key of the first dictionary is the context and the second
+            key is the cycle number.
         """
         return self._cycles
 
@@ -225,11 +226,11 @@ class TrialCycles(BaseTrial):
         """Gets all cycles from the segmented trial for a specific context.
 
         Args:
-            context (str): The context of the cycles.
+            context: The context of the cycles.
 
         Returns:
-            dict[int, Trial]: A dictionary containing the cycles
-                for the specified context.
+            A dictionary containing the cycles
+            for the specified context.
         """
         return self._cycles[context]
 
@@ -260,10 +261,9 @@ class TrialCycles(BaseTrial):
             - ...
 
         Args:
-            file_path (Path): The path to the HDF5 file.
-            base_group (str): The base group to save the data.
+            file_path: The path to the HDF5 file.
+            base_group: The base group to save the data.
                 If None, the data will be saved in the root of the file.
-                Default = None
         """
         if base_group is None:
             base_group = "/"
@@ -286,15 +286,44 @@ class TrialCycles(BaseTrial):
         return paths, data, groups
 
 
-def trial_from_hdf5(file_path: Path) -> Trial:
+def trial_from_hdf5(file_path: Path) -> Trial | TrialCycles:
     """Loads trial data from an HDF5 file.
 
+    Following structure is expected:
+    Trial:
+        - file_path (hdf5 file)
+            - Left (context)
+                - markers
+                    - xarray.DataArray
+                - analogs
+                    - xarray.DataArray
+                - events
+                    - xarray.Dataset
+            - Right (context)
+                ...
+
+    TrialCycles:
+        - file_path (folder)
+            - 0.h5 (cycle_id)
+                - Left (context)
+                    - markers
+                        - xarray.DataArray
+                    - analogs
+                        - xarray.DataArray
+                    - events
+                        - xarray.Dataset
+                - Right (context)
+                    ...
+            - ...
+
     Args:
-        file_path (Path): The path to the HDF5 file.
+        file_path: The path to the HDF5 file or folder with the expected structure.
 
     Returns:
-        Trial: A new instance of the Trial class.
+        Trial: A new instance of the Trial class if file_path is a single file.
+        TrialCycles: A new instance of the TrialCycles class if file_path is a folder.
     """
+    trial: Trial | TrialCycles
     if not file_path.exists():
         raise FileNotFoundError(f"File {file_path} does not exist.")
     elif file_path.suffix:
@@ -306,6 +335,29 @@ def trial_from_hdf5(file_path: Path) -> Trial:
 
 
 def _load_segmented_trial_file(file_path: Path) -> TrialCycles:
+    """Loads a segmented trial from a folder containing HDF5 files.
+
+    Following structure is expected:
+    - folder
+        - 0.h5 (cycle_id)
+            - Left (context)
+                - markers
+                    - xarray.DataArray
+                - analogs
+                    - xarray.DataArray
+                - events
+                    - xarray.Dataset
+            - Right (context)
+                ...
+        - ...
+
+    Args:
+        file_path: folder path containing the HDF5 files.
+
+    Returns:
+        A new instance of the TrialCycles class.
+
+    """
     trial_cycles = TrialCycles()
 
     for file in file_path.glob("**/*.h5"):
@@ -317,21 +369,51 @@ def _load_segmented_trial_file(file_path: Path) -> TrialCycles:
     return trial_cycles
 
 
-def _load_trial_file(file_path) -> Trial:
+def _load_trial_file(file_path: Path) -> Trial:
     """Loads a trial from an HDF5 file.
 
-    Args:
-        file_path (Path): The path to the HDF5 file.
-    """
-    # Check if at least one of the entities groups is present in the file
+    Following structure is expected:
+    - file_path (hdf5 file)
+        - Left (context)
+            - markers
+                - xarray.DataArray
+            - analogs
+                - xarray.DataArray
+            - events
+                - xarray.Dataset
+        - Right (context)
+            ...
 
+    Args:
+        file_path: The path to the HDF5 file.
+    """
     with h5py.File(str(file_path), "r") as f:
         trial = _load_trial(f, file_path)
 
     return trial
 
 
-def _load_trial(group, file_path):
+def _load_trial(group: h5py, file_path: Path) -> Trial:
+    """Loads a trial from an HDF5 group.
+
+    following structure is expected:
+    - groupy (hdf5)
+        - Left (context)
+            - markers
+                - xarray.DataArray
+            - analogs
+                - xarray.DataArray
+            - events
+                - xarray.Dataset
+        - Right (context)
+            ...
+    Args:
+        group: The group containing the trial data.
+        file_path: The path to the HDF5 file.
+
+    Returns:
+        A new instance of the Trial class.
+    """
     correct_file_format = False
     trial = Trial()
     for category in DataCategory:

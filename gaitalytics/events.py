@@ -15,11 +15,11 @@ class BaseEventChecker(ABC):
     """
 
     @abstractmethod
-    def check_events(self, events: pd.DataFrame) -> [bool, list[tuple] | None]:
+    def check_events(self, events: pd.DataFrame) -> tuple[bool, list | None]:
         """Checks the events in the trial.
 
         Args:
-            events (pd.DataFrame): The events to be checked.
+            events: The events to be checked.
 
         Returns:
             bool: True if the events are correct, False otherwise.
@@ -40,7 +40,7 @@ class SequenceEventChecker(BaseEventChecker):
     _LABEL_COLUMN = io.EventInputFileReader.COLUMN_LABEL
     _CONTEXT_COLUMN = io.EventInputFileReader.COLUMN_CONTEXT
 
-    def check_events(self, events: pd.DataFrame) -> [bool, list[tuple] | None]:
+    def check_events(self, events: pd.DataFrame) -> tuple[bool, list | None]:
         """Checks the sequence of events in the trial.
 
         In a normal gait cycle, the sequence of events is as follows:
@@ -50,7 +50,7 @@ class SequenceEventChecker(BaseEventChecker):
         4. Foot Off (right)
 
         Args:
-            events (pd.DataFrame): The events to be checked.
+            events: The events to be checked.
 
         Returns:
             bool: True if the sequence is correct, False otherwise.
@@ -83,10 +83,10 @@ class SequenceEventChecker(BaseEventChecker):
         4. Foot Off
 
         Args:
-            events (pd.DataFrame): The events to be checked.
+            events: The events to be checked.
 
         Returns:
-            list: A list of incorrect time slices.
+            A list of incorrect time slices.
         """
         incorrect_times = []
         last_label = None
@@ -110,10 +110,10 @@ class SequenceEventChecker(BaseEventChecker):
         4. Left
 
         Args:
-            events (pd.DataFrame): The events to be checked.
+            events: The events to be checked.
 
         Returns:
-            list: A list of incorrect time slices.
+            A list of incorrect time slices.
         """
         incorrect_times = []
         # Check the occurrence of the context in windows of 3 events.

@@ -18,10 +18,11 @@ class BaseNormaliser(ABC):
         """Normalises the input data.
 
         Args:
-            trial (model.BaseTrial): The trial to be normalised.
+            trial: The trial to be normalised.
 
         Returns:
-            model.BaseTrial: A new trial containing the normalised data.
+            model.Trial: A new trial containing the normalised data.
+            model.TrialCycles: A new segmented trial containing the normalised data
         """
         raise NotImplementedError
 
@@ -37,7 +38,7 @@ class LinearTimeNormaliser(BaseNormaliser):
         """Initializes a new instance of the LinearTimeNormaliser class.
 
         Args:
-            n_frames (int): The number of frames to normalise the data to.
+            n_frames: The number of frames to time-normalise the data to.
         """
         self.n_frames: int = n_frames
 
@@ -47,10 +48,12 @@ class LinearTimeNormaliser(BaseNormaliser):
         """Normalises the data based on time.
 
         Args:
-            trial (model.BaseTrial): The trial to be normalised.
+            trial: The trial to be normalised.
 
         Returns:
-            model.BaseTrial: A new trial containing the normalised data.
+            model.Trial: A new trial containing the time-normalised data.
+            model.TrialCycles: A new segmented trial containing the
+            time-normalised data.
         """
         if type(trial) is model.TrialCycles:
             trial = self._normalise_cycle(trial)
@@ -59,6 +62,14 @@ class LinearTimeNormaliser(BaseNormaliser):
         return trial
 
     def _normalise_trial(self, trial: model.Trial) -> model.Trial:
+        """Normalises the data of a Trial based on time.
+
+        Args:
+            trial: The trial to be normalised.
+
+        Returns: A new trial containing the time-normalised data.
+
+        """
         new_trial = model.Trial()
         for data_category in trial.get_all_data():
             data = trial.get_data(data_category)
@@ -68,10 +79,18 @@ class LinearTimeNormaliser(BaseNormaliser):
         return new_trial
 
     def _normalise_cycle(self, trial: model.TrialCycles) -> model.TrialCycles:
+        """Normalises the data of a segmented Trial based on time.
+
+        Args:
+            trial: The trial to be normalised.
+
+
+        Returns: A new trial containing the time-normalised data.
+        """
         norm_cycles = model.TrialCycles()
         for context, cycles in trial.get_all_cycles().items():
             for cycle_id, cycle in cycles.items():
-                self.normalise(cycle)
-                norm_cycles.add_cycle(context, cycle_id, cycle)
+                new_cycle = self._normalise_trial(cycle)
+                norm_cycles.add_cycle(context, cycle_id, new_cycle)
 
         return norm_cycles

@@ -19,7 +19,7 @@ class _BaseSegmentation(ABC):
         """Segments the trial data based on the segmentation method.
 
         Args:
-            trial (model.Trial): The trial to be segmented.
+            trial: The trial to be segmented.
         """
         raise NotImplementedError
 
@@ -35,7 +35,7 @@ class GaitEventsSegmentation(_BaseSegmentation):
         """Initializes a new instance of the GaitEventsSegmentation class.
 
         Args:
-            event_label (str): The label of the event to be used for segmentation.
+            event_label: The label of the event to be used for segmentation.
         """
         self.event_label = event_label
 
@@ -43,10 +43,10 @@ class GaitEventsSegmentation(_BaseSegmentation):
         """Segments the trial data based on gait events and contexts.
 
         Args:
-            trial (model.Trial): The trial to be segmented.
+            trial: The trial to be segmented.
 
         Returns:
-            model.TrialCycles: A new trial containing the all the cycles.
+            A new trial containing the all the cycles.
 
         Raises:
             ValueError: If the trial does not have events.
@@ -76,11 +76,11 @@ class GaitEventsSegmentation(_BaseSegmentation):
         This method splits the trial data based on the event label and context.
 
         Args:
-            events (pd.DataFrame): The events in the trial.
+            events: The events in the trial.
 
         Returns:
-            dict[str, list]: A dictionary containing the contexts
-                as keys and the event times as values.
+            A dictionary containing the contexts
+            as keys and the event times as values.
         """
         splits = {}
         interesting_events = events[
@@ -105,14 +105,14 @@ class GaitEventsSegmentation(_BaseSegmentation):
         """Segments the trial data based on the start and end times.
 
         Args:
-            trial (model.Trial): The trial to be segmented.
-            start_time (float): The start time of the segment.
-            end_time (float): The end time of the segment.
-            cycle_id (int): The cycle id of the segment.
-            context (str): The context of the segment.
+            trial: The trial to be segmented.
+            start_time: The start time of the segment.
+            end_time: The end time of the segment.
+            cycle_id: The cycle id of the segment.
+            context: The context of the segment.
 
         Returns:
-            model.Trial: A new trial containing the segmented data.
+            A new trial containing the segmented data.
         """
         trial_segment = model.Trial()
         # segment the data
@@ -131,12 +131,12 @@ class GaitEventsSegmentation(_BaseSegmentation):
         """Segments the events based on the start and end times.
 
         Args:
-            events (pd.DataFrame): The events to be segmented.
-            start_time (float): The start time of the segment.
-            end_time (float): The end time of the segment.
+            events: The events to be segmented.
+            start_time: The start time of the segment.
+            end_time: The end time of the segment.
 
         Returns:
-            pd.DataFrame: A DataFrame containing the segmented events.
+            A DataFrame containing the segmented events.
         """
         if events is None:
             raise ValueError("Events are not set.")
@@ -150,10 +150,14 @@ class GaitEventsSegmentation(_BaseSegmentation):
     def _update_attrs(segment: xr.DataArray, cycle_id: int, context: str):
         """Updates the attributes of the segment based on the data.
 
+        Updates time, and frames to relative values. Add additional information
+        such as context, cycles_id and used. Based on the "used"-Flag cycles can be
+        included or excluded in the analysis
+
         Args:
-            segment (xr.DataArray): The segment to be updated.
-            cycle_id (int): The cycle id of the segment.
-            context (str): The context of the segment.
+            segment: The segment to be updated.
+            cycle_id: The cycle id of the segment.
+            context: The context of the segment.
         """
         start_frame = round(
             segment.coords["time"][0].data / (1 / segment.attrs["rate"]), 0

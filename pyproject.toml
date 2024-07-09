@@ -8,12 +8,12 @@ dynamic = ["version"]
 description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
 requires-python = ">= 3.12"
-dependencies = ["netcdf4", "pandas", "tables", "h5py"]
+dependencies = ["netcdf4", "pandas", "tables", "h5py", "pyyaml"]
 
 [tool.setuptools_scm]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "cleanpy", "mypy", "pip", "pandas-stubs", "ruff"]
+test = ["pytest", "pytest-cov", "cleanpy", "pip", "pandas-stubs", "ruff", "mypy"]
 build = ["twine", "setuptools", "setuptools_scm", "build", "cleanpy"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints", "sphinx_github_changelog"]
 
@@ -58,10 +58,15 @@ exclude = ["docs*", "tests*"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.lint]
+[tool.ruff-lint]
 select = [
     "E", "F", "B", "UP", "D"
 ]
+pydocstyle = "google"
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = "True"
 
 
 
