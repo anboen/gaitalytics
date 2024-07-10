@@ -186,8 +186,7 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
     """
 
     def __init__(
-            self, file_path: Path,
-            pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
+        self, file_path: Path, pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
     ):
         """Initializes a new instance of the MarkersInputFileReader class.
 
@@ -202,7 +201,7 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
         """
         file_ext = file_path.suffix
         if file_ext == ".c3d" and (
-                pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
+            pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
         ):
             data = pyomeca_class.from_c3d(file_path)
         elif file_ext == ".trc" and pyomeca_class == pyomeca.Markers:
@@ -228,7 +227,7 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
 
     @staticmethod
     def _to_absolute_time(
-            data: xr.DataArray, first_frame: int, rate: float
+        data: xr.DataArray, first_frame: int, rate: float
     ) -> xr.DataArray:
         """Converts the time to absolute time.
 
@@ -341,13 +340,16 @@ class AnalysisInputReader(_PyomecaInputFileReader):
         """
         np_data = self._data.to_numpy()
         rs_data = np_data.reshape(
-            (np_data.shape[1] * np_data.shape[0], np_data.shape[2]), order="F")
+            (np_data.shape[1] * np_data.shape[0], np_data.shape[2]), order="F"
+        )
 
         time = self._data.coords["time"].values
         new_labels = self._create_labels()
-        new_format = xr.DataArray(rs_data,
-                                  coords={"channel": new_labels, "time": time},
-                                  dims=["channel", "time"])
+        new_format = xr.DataArray(
+            rs_data,
+            coords={"channel": new_labels, "time": time},
+            dims=["channel", "time"],
+        )
         self._copy_attrs(new_format)
         self._data = new_format
 
@@ -372,6 +374,7 @@ class AnalysisInputReader(_PyomecaInputFileReader):
             new_data: The new data array.
         """
         new_data.attrs = self._data.attrs
+        new_data.name = self._data.name
 
     def get_analysis(self) -> xr.DataArray:
         """Gets the analysis data from the input file.
@@ -380,6 +383,7 @@ class AnalysisInputReader(_PyomecaInputFileReader):
             An xarray DataArray containing the analysis data.
         """
         return self._data
+
 
 # Event to C3d Section
 # TODO: Add c3d event writer

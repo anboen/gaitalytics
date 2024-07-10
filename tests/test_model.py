@@ -6,7 +6,8 @@ import pytest
 import xarray as xr
 
 from gaitalytics.io import MarkersInputFileReader, AnalogsInputFileReader, \
-    C3dEventInputFileReader
+    C3dEventInputFileReader, AnalysisInputReader
+from gaitalytics.mapping import MappingConfigs
 from gaitalytics.model import DataCategory, Trial, TrialCycles, trial_from_hdf5
 from gaitalytics.segmentation import GaitEventsSegmentation
 
@@ -16,16 +17,21 @@ OUTPUT_PATH_SMALL: Path = Path('out/test_small')
 INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
 OUTPUT_PATH_BIG: Path = Path('out/test_big')
 
+CONFIG_FILE: Path = Path('tests/config/pig_config.yaml')
+
 
 @pytest.fixture()
 def trial_small(request):
+    configs = MappingConfigs(CONFIG_FILE)
     markers = MarkersInputFileReader(INPUT_C3D_SMALL).get_markers()
     analogs = AnalogsInputFileReader(INPUT_C3D_SMALL).get_analogs()
+    analysis = AnalysisInputReader(INPUT_C3D_SMALL, configs).get_analysis()
     events = C3dEventInputFileReader(INPUT_C3D_SMALL).get_events()
 
     trial = Trial()
     trial.add_data(DataCategory.MARKERS, markers)
     trial.add_data(DataCategory.ANALOGS, analogs)
+    trial.add_data(DataCategory.ANALYSIS, analysis)
     trial.events = events
     return trial
 
@@ -62,13 +68,16 @@ def output_path_small(request):
 
 @pytest.fixture()
 def trial_big(request):
+    configs = MappingConfigs(CONFIG_FILE)
     markers = MarkersInputFileReader(INPUT_C3D_BIG).get_markers()
     analogs = AnalogsInputFileReader(INPUT_C3D_BIG).get_analogs()
+    analysis = AnalysisInputReader(INPUT_C3D_BIG, configs).get_analysis()
     events = C3dEventInputFileReader(INPUT_C3D_BIG).get_events()
 
     trial = Trial()
     trial.add_data(DataCategory.MARKERS, markers)
     trial.add_data(DataCategory.ANALOGS, analogs)
+    trial.add_data(DataCategory.ANALYSIS, analysis)
     trial.events = events
     return trial
 
@@ -123,7 +132,7 @@ class TestTrial:
 
     def test(self, trial_small):
         rec_value = len(trial_small.get_all_data())
-        exp_value = 2
+        exp_value = 3
         assert rec_value == exp_value, f"Expected {exp_value} data categories, got {rec_value}"
 
     def test_save_empty_to_hdf5(self, output_file_path_small):
@@ -145,7 +154,7 @@ class TestTrial:
 
         with h5py.File(output_file_path_small, 'r') as f:
             rec_value = len(f.keys())
-            exp_value = 3
+            exp_value = 4
             assert rec_value == exp_value, f"Expected {exp_value} datasets, got {rec_value}"
 
     def test_load_hdf5(self, trial_small, output_file_path_small):
@@ -154,7 +163,7 @@ class TestTrial:
         loaded_trial = trial_from_hdf5(output_file_path_small)
 
         rec_value = len(loaded_trial.get_all_data())
-        exp_value = 2
+        exp_value = 3
         assert rec_value == exp_value, f"Expected {exp_value} data categories, got {rec_value}"
 
         assert loaded_trial.events is not None, "Expected events to be loaded, but they are not"
@@ -167,7 +176,7 @@ class TestTrial:
 
         with h5py.File(output_file_path_big, 'r') as f:
             rec_value = len(f.keys())
-            exp_value = 3
+            exp_value = 4
             assert rec_value == exp_value, f"Expected {exp_value} datasets, got {rec_value}"
 
     def test_load_hdf5_big(self, trial_big, output_file_path_big):
@@ -176,7 +185,7 @@ class TestTrial:
         loaded_trial = trial_from_hdf5(output_file_path_big)
 
         rec_value = len(loaded_trial.get_all_data())
-        exp_value = 2
+        exp_value = 3
         assert rec_value == exp_value, f"Expected {exp_value} data categories, got {rec_value}"
 
         assert loaded_trial.events is not None, "Expected events to be loaded, but they are not"
@@ -203,7 +212,8 @@ class TestSegmentedTrial:
 
     def test_to_write_cycle(self, trial_small, output_file_path_small):
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
-        trial: xr.DataArray = segments.get_cycle("Left", 0).get_data(DataCategory.MARKERS)
+        trial: xr.DataArray = segments.get_cycle("Left", 0).get_data(
+            DataCategory.MARKERS)
         trial.to_netcdf(output_file_path_small, group="Left/0/markers")
 
         assert output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"
