@@ -1,5 +1,3 @@
-"""This module provides the MappingConfigs class to read the configuration file."""
-
 from pathlib import Path
 
 import yaml
@@ -77,5 +75,10 @@ class MappingConfigs:
         return self._configs[self._SEC_ANALYSIS][self._SEC_ANALOGS_ANALYSIS]
 
     def _check_analysis_section(self):
+        """Checks if the analysis section is present in the config file.
+
+        Raises:
+            ValueError: If the analysis section is missing in the config file.
+        """
         if self._configs is None or self._SEC_ANALYSIS not in self._configs:
             raise ValueError("Analysis section is missing in the config file.")

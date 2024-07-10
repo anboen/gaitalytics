@@ -9,6 +9,8 @@ import pandas as pd
 import pyomeca
 import xarray as xr
 
+import gaitalytics.mapping as mapping
+
 
 # Input Section
 class _BaseInputFileReader:
@@ -184,7 +186,8 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
     """
 
     def __init__(
-        self, file_path: Path, pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
+            self, file_path: Path,
+            pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
     ):
         """Initializes a new instance of the MarkersInputFileReader class.
 
@@ -197,18 +200,18 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
                 The pyomeca class to use for reading the data.
 
         """
-        file_ext = file_path.name.split(".")[-1]
-        if file_ext == "c3d" and (
-            pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
+        file_ext = file_path.suffix
+        if file_ext == ".c3d" and (
+                pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
         ):
             data = pyomeca_class.from_c3d(file_path)
-        elif file_ext == "trc" and pyomeca_class == pyomeca.Markers:
+        elif file_ext == ".trc" and pyomeca_class == pyomeca.Markers:
             raise NotImplementedError("TRC file format is not supported for markers")
-        elif file_ext == "mot" and pyomeca_class == pyomeca.Analogs:
+        elif file_ext == ".mot" and pyomeca_class == pyomeca.Analogs:
             data = pyomeca_class.from_mot(
                 file_path, pandas_kwargs={"sep": "\t", "index_col": False}
             )
-        elif file_ext == "sto" and pyomeca_class == pyomeca.Analogs:
+        elif file_ext == ".sto" and pyomeca_class == pyomeca.Analogs:
             raise NotImplementedError("STO file format is not supported for analogs")
         else:
             raise ValueError(
@@ -220,13 +223,20 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
             frame_rate = data.attrs["rate"]
             data = self._to_absolute_time(data, first_frame, frame_rate)
 
-        self.data = data
+        self._data = data
         super().__init__(file_path)
 
     @staticmethod
     def _to_absolute_time(
-        data: xr.DataArray, first_frame: int, rate: float
+            data: xr.DataArray, first_frame: int, rate: float
     ) -> xr.DataArray:
+        """Converts the time to absolute time.
+
+        Args:
+            data: The data to convert.
+            first_frame: The first frame of the data.
+            rate: The rate of the data.
+        """
         first_frame = first_frame
         data.coords["time"] = data.coords["time"] + (first_frame * 1 / rate)
         return data
@@ -246,6 +256,7 @@ class MarkersInputFileReader(_PyomecaInputFileReader):
 
         """
         super().__init__(file_path, pyomeca.Markers)
+        self.data = self._data.drop_sel(axis="ones")
 
     def get_markers(self) -> xr.DataArray:
         """Gets the markers from the input file.
@@ -277,8 +288,98 @@ class AnalogsInputFileReader(_PyomecaInputFileReader):
         Returns:
             An xarray DataArray containing the analog data.
         """
-        return self.data
+        return self._data
 
+
+class AnalysisInputReader(_PyomecaInputFileReader):
+    """Read out data from modelled data form different input format."""
+
+    def __init__(self, file_path: Path, configs: mapping.MappingConfigs):
+        """Initializes a new instance of the AnalysisInputReader class.
+
+        Args:
+            file_path: The path to the input file.
+            configs: The mapping configurations.
+        """
+        extension = file_path.suffix
+        pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
+        if extension == ".c3d":
+            pyomeca_class = pyomeca.Markers
+        elif extension == ".mot":
+            pyomeca_class = pyomeca.Analogs
+        elif extension == ".sto":
+            raise NotImplementedError("STO file format is not supported for analogs")
+        else:
+            raise ValueError(f"Unsupported file extension: {extension}")
+        super().__init__(file_path, pyomeca_class)
+        self.configs = configs
+
+        if pyomeca_class == pyomeca.Markers:
+            self._data = self._data.drop_sel(axis="ones")
+            self._filter_markers()
+            self._flatten_array()
+        else:
+            self._filter_analogs()
+
+    def _filter_analogs(self):
+        """Filter the analogs based on the mapping configurations."""
+        labels = self.configs.get_analogs_analysis()
+        if labels:
+            self._data = self._data.sel(channel=labels)
+
+    def _filter_markers(self):
+        """Filter the markers based on the mapping configurations."""
+        labels = self.configs.get_markers_analysis()
+        if labels:
+            self._data = self._data.sel(channel=labels)
+
+    def _flatten_array(self):
+        """Flatten the markers array to a 2D array.
+
+        The markers xarray is reshaped to a 2D array with the shape to generalize format
+        from c3d and sto files.
+        """
+        np_data = self._data.to_numpy()
+        rs_data = np_data.reshape(
+            (np_data.shape[1] * np_data.shape[0], np_data.shape[2]), order="F")
+
+        time = self._data.coords["time"].values
+        new_labels = self._create_labels()
+        new_format = xr.DataArray(rs_data,
+                                  coords={"channel": new_labels, "time": time},
+                                  dims=["channel", "time"])
+        self._copy_attrs(new_format)
+        self._data = new_format
+
+    def _create_labels(self) -> list[str]:
+        """Create new labels for the flattened array.
+
+        Returns:
+            List of labels including axis in the label name.
+        """
+        labels = self._data.coords["channel"].values
+        axis = self._data.coords["axis"].values
+        new_labels = []
+        for label in labels:
+            for axe in axis:
+                new_labels.append(f"{label}_{axe}")
+        return new_labels
+
+    def _copy_attrs(self, new_data: xr.DataArray):
+        """Copy the attributes from the old data to the new data.
+
+        Args:
+            new_data: The new data array.
+        """
+        new_data.attrs = self._data.attrs
+
+    def get_analysis(self) -> xr.DataArray:
+        """Gets the analysis data from the input file.
+
+        Returns:
+            An xarray DataArray containing the analysis data.
+        """
+        return self._data
 
 # Event to C3d Section
 # TODO: Add c3d event writer

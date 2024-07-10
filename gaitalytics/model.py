@@ -18,10 +18,12 @@ class DataCategory(Enum):
     Attributes:
         MARKERS: The marker's category.
         ANALOGS: The analog's category.
+        ANALYSIS: The analysis category.
     """
 
     MARKERS: str = "markers"
     ANALOGS: str = "analogs"
+    ANALYSIS: str = "analysis"
 
 
 class BaseTrial(ABC):
@@ -419,7 +421,7 @@ def _load_trial(group: h5py, file_path: Path) -> Trial:
     for category in DataCategory:
         if category.value in group.keys():
             with xr.load_dataarray(
-                file_path, group=f"{group.name}/{category.value}"
+                    file_path, group=f"{group.name}/{category.value}"
             ) as data:
                 trial.add_data(category, data)
 
@@ -433,3 +435,5 @@ def _load_trial(group: h5py, file_path: Path) -> Trial:
         raise ValueError(f"File {file_path} does not have the correct format.")
 
     return trial
+
+
