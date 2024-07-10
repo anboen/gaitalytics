@@ -19,7 +19,7 @@ docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints", "sphinx_github
 
 [tool.pixi.project]
 channels = ["conda-forge"]
-platforms = ["win-64", "win-32", "osx-64", "linux-64", "linux-32"]
+platforms = ["win-64", "linux-64"]
 
 [tool.pixi.pypi-dependencies]
 gaitalytics = { path = ".", editable = true }
