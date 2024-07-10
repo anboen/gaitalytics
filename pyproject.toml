@@ -27,6 +27,7 @@ gaitalytics = { path = ".", editable = true }
 [tool.pixi.dependencies]
 pyomeca = ">=2021.0.1,<2021.1"
 pixi-pycharm = ">=0.0.6,<0.1"
+ezc3d = ">=1.5.10,<1.6"
 
 
 # Environments

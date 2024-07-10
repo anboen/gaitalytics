@@ -1431,8 +1431,8 @@ packages:
 - kind: pypi
   name: blosc2
   version: 2.7.0
-  url: https://files.pythonhosted.org/packages/95/03/8e7aaf9295c490b495ef9663d4e6a53b7b9b669c856425275a8a2ed6dc10/blosc2-2.7.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: c6a700f9324b37e814c5633c43b081c60962f4dd59c0340cefe5f61f9f0411fd
+  url: https://files.pythonhosted.org/packages/60/bf/6ceba93b39a716bca4feabccb034292f69fc06fb02bb86ecdb828cb95881/blosc2-2.7.0-cp312-cp312-win_amd64.whl
+  sha256: 62d2a6eaf1be1858993a4d7b2b8efd2ede5c4eaabe030c611cd075d907aa5400
   requires_dist:
   - numpy>=1.20.3
   - ndindex>=1.4
@@ -1443,8 +1443,8 @@ packages:
 - kind: pypi
   name: blosc2
   version: 2.7.0
-  url: https://files.pythonhosted.org/packages/60/bf/6ceba93b39a716bca4feabccb034292f69fc06fb02bb86ecdb828cb95881/blosc2-2.7.0-cp312-cp312-win_amd64.whl
-  sha256: 62d2a6eaf1be1858993a4d7b2b8efd2ede5c4eaabe030c611cd075d907aa5400
+  url: https://files.pythonhosted.org/packages/95/03/8e7aaf9295c490b495ef9663d4e6a53b7b9b669c856425275a8a2ed6dc10/blosc2-2.7.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: c6a700f9324b37e814c5633c43b081c60962f4dd59c0340cefe5f61f9f0411fd
   requires_dist:
   - numpy>=1.20.3
   - ndindex>=1.4
@@ -1755,8 +1755,8 @@ packages:
 - kind: pypi
   name: cftime
   version: 1.6.4
-  url: https://files.pythonhosted.org/packages/04/56/233d817ef571d778281f3d639049b342f6ff0bb4de4c5ee630befbd55319/cftime-1.6.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: f92f2e405eeda47b30ab6231d8b7d136a55f21034d394f93ade322d356948654
+  url: https://files.pythonhosted.org/packages/17/98/ba5b4a2f37c6c88454b696dd5c7a4e76fc8bfd014364b47ddd7e2cec0fcd/cftime-1.6.4-cp312-cp312-win_amd64.whl
+  sha256: 5b5ad7559a16bedadb66af8e417b6805f758acb57aa38d2730844dfc63a1e667
   requires_dist:
   - numpy>1.13.3 ; python_version < '3.12.0rc1'
   - numpy>=1.26.0b1 ; python_version >= '3.12.0rc1'
@@ -1764,8 +1764,8 @@ packages:
 - kind: pypi
   name: cftime
   version: 1.6.4
-  url: https://files.pythonhosted.org/packages/17/98/ba5b4a2f37c6c88454b696dd5c7a4e76fc8bfd014364b47ddd7e2cec0fcd/cftime-1.6.4-cp312-cp312-win_amd64.whl
-  sha256: 5b5ad7559a16bedadb66af8e417b6805f758acb57aa38d2730844dfc63a1e667
+  url: https://files.pythonhosted.org/packages/04/56/233d817ef571d778281f3d639049b342f6ff0bb4de4c5ee630befbd55319/cftime-1.6.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: f92f2e405eeda47b30ab6231d8b7d136a55f21034d394f93ade322d356948654
   requires_dist:
   - numpy>1.13.3 ; python_version < '3.12.0rc1'
   - numpy>=1.26.0b1 ; python_version >= '3.12.0rc1'
@@ -2275,9 +2275,9 @@ packages:
   timestamp: 1604416621168
 - kind: pypi
   name: gaitalytics
-  version: 0.1.dev19+g957d90b.d20240710
+  version: 0.1.dev20+g46737a7.d20240710
   path: .
-  sha256: a86a1685a6d1cd9c590c85f718004ac86283423e384fc2deb6570a2da9e429f4
+  sha256: ddab637784011b123f2c0dba36fe25b01697c1f9f1a84220999dc6ba72603204
   requires_dist:
   - netcdf4
   - pandas
@@ -2585,16 +2585,16 @@ packages:
 - kind: pypi
   name: h5py
   version: 3.11.0
-  url: https://files.pythonhosted.org/packages/db/7e/fedac8bb8c4729409e2dec5e4136a289116d701d54f69ce73c5617afc5f0/h5py-3.11.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: aa6ae84a14103e8dc19266ef4c3e5d7c00b68f21d07f2966f0ca7bdb6c2761fb
+  url: https://files.pythonhosted.org/packages/2b/b2/0ee327933ffa37af1fc7915df7fc067e6009adcd8445d55ad07a9bec11b5/h5py-3.11.0-cp312-cp312-win_amd64.whl
+  sha256: 21dbdc5343f53b2e25404673c4f00a3335aef25521bd5fa8c707ec3833934892
   requires_dist:
   - numpy>=1.17.3
   requires_python: '>=3.8'
 - kind: pypi
   name: h5py
   version: 3.11.0
-  url: https://files.pythonhosted.org/packages/2b/b2/0ee327933ffa37af1fc7915df7fc067e6009adcd8445d55ad07a9bec11b5/h5py-3.11.0-cp312-cp312-win_amd64.whl
-  sha256: 21dbdc5343f53b2e25404673c4f00a3335aef25521bd5fa8c707ec3833934892
+  url: https://files.pythonhosted.org/packages/db/7e/fedac8bb8c4729409e2dec5e4136a289116d701d54f69ce73c5617afc5f0/h5py-3.11.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: aa6ae84a14103e8dc19266ef4c3e5d7c00b68f21d07f2966f0ca7bdb6c2761fb
   requires_dist:
   - numpy>=1.17.3
   requires_python: '>=3.8'
@@ -4572,14 +4572,14 @@ packages:
 - kind: pypi
   name: markupsafe
   version: 2.1.5
-  url: https://files.pythonhosted.org/packages/3f/14/c3554d512d5f9100a95e737502f4a2323a1959f6d0d01e0d0997b35f7b10/MarkupSafe-2.1.5-cp312-cp312-win_amd64.whl
-  sha256: 823b65d8706e32ad2df51ed89496147a42a2a6e01c13cfb6ffb8b1e92bc910bb
+  url: https://files.pythonhosted.org/packages/0a/0d/2454f072fae3b5a137c119abf15465d1771319dfe9e4acbb31722a0fff91/MarkupSafe-2.1.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: f5dfb42c4604dddc8e4305050aa6deb084540643ed5804d7455b5df8fe16f5e5
   requires_python: '>=3.7'
 - kind: pypi
   name: markupsafe
   version: 2.1.5
-  url: https://files.pythonhosted.org/packages/0a/0d/2454f072fae3b5a137c119abf15465d1771319dfe9e4acbb31722a0fff91/MarkupSafe-2.1.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: f5dfb42c4604dddc8e4305050aa6deb084540643ed5804d7455b5df8fe16f5e5
+  url: https://files.pythonhosted.org/packages/3f/14/c3554d512d5f9100a95e737502f4a2323a1959f6d0d01e0d0997b35f7b10/MarkupSafe-2.1.5-cp312-cp312-win_amd64.whl
+  sha256: 823b65d8706e32ad2df51ed89496147a42a2a6e01c13cfb6ffb8b1e92bc910bb
   requires_python: '>=3.7'
 - kind: conda
   name: matplotlib-base
@@ -4728,14 +4728,14 @@ packages:
 - kind: pypi
   name: msgpack
   version: 1.0.8
-  url: https://files.pythonhosted.org/packages/04/2a/c833a8503be9030083f0469e7a3c74d3622a3b4eae676c3934d3ccc01036/msgpack-1.0.8-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: 8db8e423192303ed77cff4dce3a4b88dbfaf43979d280181558af5e2c3c71afc
+  url: https://files.pythonhosted.org/packages/72/5c/5facaa9b5d1b3ead831697daacf37d485af312bbe483ac6ecf43a3dd777f/msgpack-1.0.8-cp312-cp312-win_amd64.whl
+  sha256: 74398a4cf19de42e1498368c36eed45d9528f5fd0155241e82c4082b7e16cffd
   requires_python: '>=3.8'
 - kind: pypi
   name: msgpack
   version: 1.0.8
-  url: https://files.pythonhosted.org/packages/72/5c/5facaa9b5d1b3ead831697daacf37d485af312bbe483ac6ecf43a3dd777f/msgpack-1.0.8-cp312-cp312-win_amd64.whl
-  sha256: 74398a4cf19de42e1498368c36eed45d9528f5fd0155241e82c4082b7e16cffd
+  url: https://files.pythonhosted.org/packages/04/2a/c833a8503be9030083f0469e7a3c74d3622a3b4eae676c3934d3ccc01036/msgpack-1.0.8-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: 8db8e423192303ed77cff4dce3a4b88dbfaf43979d280181558af5e2c3c71afc
   requires_python: '>=3.8'
 - kind: conda
   name: msys2-conda-epoch
@@ -4864,8 +4864,8 @@ packages:
 - kind: pypi
   name: netcdf4
   version: 1.7.1.post1
-  url: https://files.pythonhosted.org/packages/2a/9d/1dfb952373d37bf9205ac96df0ee949942821350fc1a8e49028b076f9798/netCDF4-1.7.1.post1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: 988c45f9122337a12267fb158953c0609e3ea50a557335a3105f104416a4821a
+  url: https://files.pythonhosted.org/packages/e5/f4/f3766752af4e72b10421f4fd7cca765b6395f7a12acea9d91428ffac29a9/netCDF4-1.7.1.post1-cp312-cp312-win_amd64.whl
+  sha256: 8fb3ed3541fa1b5b46e9d92d7e803734a1a3f37d8f5adf5fdf7957c7750cb20e
   requires_dist:
   - cftime
   - certifi
@@ -4877,8 +4877,8 @@ packages:
 - kind: pypi
   name: netcdf4
   version: 1.7.1.post1
-  url: https://files.pythonhosted.org/packages/e5/f4/f3766752af4e72b10421f4fd7cca765b6395f7a12acea9d91428ffac29a9/netCDF4-1.7.1.post1-cp312-cp312-win_amd64.whl
-  sha256: 8fb3ed3541fa1b5b46e9d92d7e803734a1a3f37d8f5adf5fdf7957c7750cb20e
+  url: https://files.pythonhosted.org/packages/2a/9d/1dfb952373d37bf9205ac96df0ee949942821350fc1a8e49028b076f9798/netCDF4-1.7.1.post1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: 988c45f9122337a12267fb158953c0609e3ea50a557335a3105f104416a4821a
   requires_dist:
   - cftime
   - certifi
@@ -4936,16 +4936,16 @@ packages:
 - kind: pypi
   name: numexpr
   version: 2.10.1
-  url: https://files.pythonhosted.org/packages/f9/61/dd156698c6211a877170303b49be711f6952570c2a03bfdd2ae3217fb213/numexpr-2.10.1.tar.gz
-  sha256: 9bba99d354a65f1a008ab8b87f07d84404c668e66bab624df5b6b5373403cf81
+  url: https://files.pythonhosted.org/packages/f5/4f/6c2621db459b8cab5cfcbd21c6ccc6cde594d0256853d9a79e4f454ed131/numexpr-2.10.1-cp312-cp312-win_amd64.whl
+  sha256: 300e577b3c006dd7a8270f1bb2e8a00ee15bf235b1650fe2a6febec2954bc2c3
   requires_dist:
   - numpy>=1.23.0
   requires_python: '>=3.9'
 - kind: pypi
   name: numexpr
   version: 2.10.1
-  url: https://files.pythonhosted.org/packages/f5/4f/6c2621db459b8cab5cfcbd21c6ccc6cde594d0256853d9a79e4f454ed131/numexpr-2.10.1-cp312-cp312-win_amd64.whl
-  sha256: 300e577b3c006dd7a8270f1bb2e8a00ee15bf235b1650fe2a6febec2954bc2c3
+  url: https://files.pythonhosted.org/packages/f9/61/dd156698c6211a877170303b49be711f6952570c2a03bfdd2ae3217fb213/numexpr-2.10.1.tar.gz
+  sha256: 9bba99d354a65f1a008ab8b87f07d84404c668e66bab624df5b6b5373403cf81
   requires_dist:
   - numpy>=1.23.0
   requires_python: '>=3.9'
@@ -5866,14 +5866,14 @@ packages:
 - kind: pypi
   name: pyyaml
   version: 6.0.1
-  url: https://files.pythonhosted.org/packages/b4/33/720548182ffa8344418126017aa1d4ab4aeec9a2275f04ce3f3573d8ace8/PyYAML-6.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: 6c22bec3fbe2524cde73d7ada88f6566758a8f7227bfbf93a408a9d86bcc12a0
+  url: https://files.pythonhosted.org/packages/2b/9f/fbade56564ad486809c27b322d0f7e6a89c01f6b4fe208402e90d4443a99/PyYAML-6.0.1-cp312-cp312-win_amd64.whl
+  sha256: 0d3304d8c0adc42be59c5f8a4d9e3d7379e6955ad754aa9d6ab7a398b59dd1df
   requires_python: '>=3.6'
 - kind: pypi
   name: pyyaml
   version: 6.0.1
-  url: https://files.pythonhosted.org/packages/2b/9f/fbade56564ad486809c27b322d0f7e6a89c01f6b4fe208402e90d4443a99/PyYAML-6.0.1-cp312-cp312-win_amd64.whl
-  sha256: 0d3304d8c0adc42be59c5f8a4d9e3d7379e6955ad754aa9d6ab7a398b59dd1df
+  url: https://files.pythonhosted.org/packages/b4/33/720548182ffa8344418126017aa1d4ab4aeec9a2275f04ce3f3573d8ace8/PyYAML-6.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: 6c22bec3fbe2524cde73d7ada88f6566758a8f7227bfbf93a408a9d86bcc12a0
   requires_python: '>=3.6'
 - kind: conda
   name: qhull
@@ -6487,8 +6487,8 @@ packages:
 - kind: pypi
   name: tables
   version: 3.9.2
-  url: https://files.pythonhosted.org/packages/dd/50/8efbd7339a1fd69658f623bcee5e4c0318d823cc39bb23dbc6b0ff1a7491/tables-3.9.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: b131c9b4e003816a45e2efe5c5c797d01d8308cac4aee72597a15837cedb605c
+  url: https://files.pythonhosted.org/packages/8b/84/93dd082a991c36f3e55e170cb71c4011256e45549c0a3b0d3693cf9053e3/tables-3.9.2-cp312-cp312-win_amd64.whl
+  sha256: c6304d321452fd56865e5c309e38373011b0f0f6c714786c5660613ceb623acb
   requires_dist:
   - numpy>=1.19.0
   - numexpr>=2.6.2
@@ -6503,8 +6503,8 @@ packages:
 - kind: pypi
   name: tables
   version: 3.9.2
-  url: https://files.pythonhosted.org/packages/8b/84/93dd082a991c36f3e55e170cb71c4011256e45549c0a3b0d3693cf9053e3/tables-3.9.2-cp312-cp312-win_amd64.whl
-  sha256: c6304d321452fd56865e5c309e38373011b0f0f6c714786c5660613ceb623acb
+  url: https://files.pythonhosted.org/packages/dd/50/8efbd7339a1fd69658f623bcee5e4c0318d823cc39bb23dbc6b0ff1a7491/tables-3.9.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: b131c9b4e003816a45e2efe5c5c797d01d8308cac4aee72597a15837cedb605c
   requires_dist:
   - numpy>=1.19.0
   - numexpr>=2.6.2
