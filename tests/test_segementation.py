@@ -98,6 +98,30 @@ class TestEventSegmentation:
 
         _test_cycle_id_context(segments)
 
+    def test_segmented_events_small(self, small_trial):
+        segmentation = GaitEventsSegmentation("Foot Strike")
+        segments = segmentation.segment(small_trial)
+        for context, cycles in segments.get_all_cycles().items():
+            for cycle_id, cycle in cycles.items():
+                events = cycle.events
+                rec_value = len(events)
+                exp_value = 3
+                message = f"Expected {exp_value} events, got {rec_value} in {context}: {cycle_id}"
+                assert rec_value == exp_value, message
+
+
+    def test_segmented_events_big(self, big_trial):
+        segmentation = GaitEventsSegmentation("Foot Strike")
+        segments = segmentation.segment(big_trial)
+        for context, cycles in segments.get_all_cycles().items():
+            for cycle_id, cycle in cycles.items():
+                events = cycle.events
+                rec_value = len(events)
+                exp_value = 3
+                message = f"Expected {exp_value} events, got {rec_value} in {context}: {cycle_id}"
+                assert rec_value == exp_value, message
+
+
 
 def _test_cycle_id_context(segments: TrialCycles):
     # Test cycle_id and context attrs
@@ -133,7 +157,7 @@ def _test_start_end_frame(cycles: TrialCycles):
     for context, cycle_segments in cycles.get_all_cycles().items():
         for cycle_idx in range(len(cycle_segments.keys()) - 1):
             current_key = list(cycle_segments.keys())[cycle_idx]
-            next_key = list(cycle_segments.keys())[cycle_idx+1]
+            next_key = list(cycle_segments.keys())[cycle_idx + 1]
             current_trial: Trial = cycle_segments[current_key]
             next_trial: Trial = cycle_segments[next_key]
 

@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import xarray as xr
 
+import gaitalytics.events as ga_events
 import gaitalytics.io as io
 import gaitalytics.model as model
 
@@ -31,7 +32,7 @@ class GaitEventsSegmentation(_BaseSegmentation):
     It splits the trial data based on the event label and context.
     """
 
-    def __init__(self, event_label: str = "Foot Strike"):
+    def __init__(self, event_label: str = ga_events.FOOT_STRIKE):
         """Initializes a new instance of the GaitEventsSegmentation class.
 
         Args:
@@ -121,16 +122,24 @@ class GaitEventsSegmentation(_BaseSegmentation):
             self._update_attrs(segment, cycle_id, context)
             trial_segment.add_data(category, segment)
         # segment the events
-        trial_segment.events = self._segment_events(trial.events, start_time, end_time)
+        trial_segment.events = self._segment_events(
+            context, cycle_id, trial.events, start_time, end_time
+        )
         return trial_segment
 
     @staticmethod
     def _segment_events(
-        events: pd.DataFrame | None, start_time: float, end_time: float
+        context: str,
+        cycle_id: int,
+        events: pd.DataFrame | None,
+        start_time: float,
+        end_time: float,
     ) -> pd.DataFrame:
         """Segments the events based on the start and end times.
 
         Args:
+            context: The context of the segment.
+            cycle_id: The cycle id of the segment.
             events: The events to be segmented.
             start_time: The start time of the segment.
             end_time: The end time of the segment.
@@ -140,11 +149,19 @@ class GaitEventsSegmentation(_BaseSegmentation):
         """
         if events is None:
             raise ValueError("Events are not set.")
-
-        return events[
+        new_events = events[
             (events[io.EventInputFileReader.COLUMN_TIME] > start_time)
             & (events[io.EventInputFileReader.COLUMN_TIME] < end_time)
         ]
+        new_events[io.EventInputFileReader.COLUMN_TIME] -= start_time
+
+        new_events.attrs = {
+            "end_time": end_time - start_time,
+            "context": context,
+            "cycle_id": cycle_id,
+            "used": 1,
+        }
+        return new_events
 
     @staticmethod
     def _update_attrs(segment: xr.DataArray, cycle_id: int, context: str):

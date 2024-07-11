@@ -6,6 +6,9 @@ import pandas as pd
 
 import gaitalytics.io as io
 
+FOOT_STRIKE = "Foot Strike"
+FOOT_OFF = "Foot Off"
+
 
 class BaseEventChecker(ABC):
     """Abstract class for event checkers.
