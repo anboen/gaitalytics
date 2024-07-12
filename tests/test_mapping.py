@@ -33,3 +33,9 @@ class TestMappingConfigs:
 
         with pytest.raises(ValueError):
             configs.get_analogs_analysis()
+
+    def test_get_marker_mapping(self):
+        configs = mapping.MappingConfigs(Path('tests/config/pig_config.yaml'))
+        rec_value = configs.get_marker_mapping(mapping.MappedMarkers.L_TOE)
+        exp_value = 'LTOE'
+        assert rec_value == exp_value, f"Expected {exp_value} marker, got {rec_value}"

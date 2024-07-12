@@ -1,6 +1,22 @@
+from enum import Enum
 from pathlib import Path
 
 import yaml
+
+
+class MappedMarkers(Enum):
+    # Foot
+    L_HEEL = "l_heel"
+    R_HEEL = "r_heel"
+    L_TOE = "l_toe"
+    R_TOE = "r_toe"
+
+    # Hip
+    L_ANT_HIP = "l_ant_hip"
+    R_POST_HIP = "r_post_hip"
+    L_POST_HIP = "l_post_hip"
+    R_ANT_HIP = "r_ant_hip"
+    SACRUM = "sacrum"
 
 
 class MappingConfigs:
@@ -31,6 +47,10 @@ class MappingConfigs:
     _SEC_ANALYSIS: str = "analysis"
     _SEC_MARKERS_ANALYSIS: str = "markers"
     _SEC_ANALOGS_ANALYSIS: str = "analogs"
+
+    _SEC_MAPPING: str = "mapping"
+    _SEC_MARKERS_MAPPING: str = "markers"
+    _SEC_ANALOGS_MAPPING: str = "analogs"
 
     def __init__(self, config_path: Path):
         """Initializes a new instance of the MappingConfigs class.
@@ -82,3 +102,30 @@ class MappingConfigs:
         """
         if self._configs is None or self._SEC_ANALYSIS not in self._configs:
             raise ValueError("Analysis section is missing in the config file.")
+
+    def get_marker_mapping(self, marker: MappedMarkers) -> str:
+        """Gets the mapping of markers.
+
+        Args:
+            marker: The marker to get the mapping for.
+
+        Returns:
+            The mapped marker name if present in the config file.
+
+        Raises:
+            ValueError: If sections in the mapping are missing in the config file.
+        """
+        self._check_marker_mapping()
+
+        return self._configs[self._SEC_MAPPING][self._SEC_MARKERS_MAPPING][marker.value]
+
+    def _check_marker_mapping(self):
+        """Checks if the marker mapping section is present in the config file.
+
+        Raises:
+            ValueError: If the mapping section is missing in the config file.
+        """
+        if self._configs is None or self._SEC_MAPPING not in self._configs:
+            raise ValueError("Mapping section is missing in the config file.")
+        elif self._SEC_MARKERS_MAPPING not in self._configs[self._SEC_MAPPING]:
+            raise ValueError("Marker mapping section is missing in the config file.")

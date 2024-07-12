@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from gaitalytics.features import TimeSeriesFeatures, TemporalFeatures
+from gaitalytics.features import TimeSeriesFeatures, TemporalFeatures, SpatialFeatures
 from gaitalytics.io import MarkersInputFileReader, C3dEventInputFileReader, \
     AnalogsInputFileReader, AnalysisInputReader
 from gaitalytics.mapping import MappingConfigs
@@ -10,6 +10,7 @@ from gaitalytics.model import DataCategory, Trial
 from gaitalytics.segmentation import GaitEventsSegmentation
 
 INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
+INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
 CONFIG_FILE = Path('tests/config/pig_config.yaml')
 
 
@@ -25,6 +26,23 @@ def trial_small(request):
     analogs = AnalogsInputFileReader(INPUT_C3D_SMALL).get_analogs()
     analysis = AnalysisInputReader(INPUT_C3D_SMALL, configs).get_analysis()
     events = C3dEventInputFileReader(INPUT_C3D_SMALL).get_events()
+
+    trial = Trial()
+    trial.add_data(DataCategory.MARKERS, markers)
+    trial.add_data(DataCategory.ANALOGS, analogs)
+    trial.add_data(DataCategory.ANALYSIS, analysis)
+    trial.events = events
+
+    return GaitEventsSegmentation().segment(trial)
+
+
+@pytest.fixture()
+def trial_big(request):
+    configs = MappingConfigs(CONFIG_FILE)
+    markers = MarkersInputFileReader(INPUT_C3D_BIG).get_markers()
+    analogs = AnalogsInputFileReader(INPUT_C3D_BIG).get_analogs()
+    analysis = AnalysisInputReader(INPUT_C3D_BIG, configs).get_analysis()
+    events = C3dEventInputFileReader(INPUT_C3D_BIG).get_events()
 
     trial = Trial()
     trial.add_data(DataCategory.MARKERS, markers)
@@ -86,12 +104,14 @@ class TestTemporalFeatures:
         rec_value = features.loc["Left", 0, "cadence"]
         exp_value = 113.2076
         assert rec_value == pytest.approx(
-            exp_value, rel=1e-3), f"Expected {exp_value}, got {rec_value} in cadence for Left context"
+            exp_value,
+            rel=1e-3), f"Expected {exp_value}, got {rec_value} in cadence for Left context"
 
         rec_value = features.loc["Right", 0, "cadence"]
         exp_value = 110.0917
         assert rec_value == pytest.approx(
-            exp_value, rel=1e-3), f"Expected {exp_value}, got {rec_value} in cadence for Right context"
+            exp_value,
+            rel=1e-3), f"Expected {exp_value}, got {rec_value} in cadence for Right context"
 
         # Stride time
         rec_value = features.loc["Left", 0, "stride_time"]
@@ -145,7 +165,7 @@ class TestTemporalFeatures:
 
         # Opposite foot off
         rec_value = features.loc["Left", 0, "opposite_foot_off"]
-        exp_value = 11.3208 /100
+        exp_value = 11.3208 / 100
         assert rec_value == pytest.approx(
             exp_value,
             rel=1e-5), f"Expected {exp_value}, got {rec_value} in opposite_foot_off for Left context"
@@ -181,3 +201,50 @@ class TestTemporalFeatures:
         assert rec_value == pytest.approx(
             exp_value,
             rel=1e-5), f"Expected {exp_value}, got {rec_value} in foot_off for Right context"
+
+
+class TestSpatialFeatures:
+    def test_calculation_big(self, configs, trial_big):
+        features = SpatialFeatures(configs).calculate(trial_big)
+        for context, cycles in trial_big.get_all_cycles().items():
+            for cycle_id, cycle in cycles.items():
+                event = cycle.events.attrs["end_time"]
+                markers = cycle.get_data(DataCategory.MARKERS).drop_sel(axis="z").sel(
+                    time=event, method="nearest")
+
+                ipsi_label = "RHEE" if context == "Right" else "LHEE"
+                contra_label = "LHEE" if context == "Right" else "RHEE"
+                ipsi_heel = markers.sel(channel=ipsi_label)
+                contra_heel = markers.sel(channel=contra_label)
+                distances = ipsi_heel - contra_heel
+
+                exp_value = distances.sel(axis="y")
+                exp_value = exp_value.meca.abs()
+                rec_value = features.loc[context, cycle_id, "step_length"]
+                assert rec_value == pytest.approx(
+                    exp_value,
+                    rel=1e-0), f"Expected {exp_value}, got {rec_value} in step_length for {context} context"
+
+                exp_value = distances.sel(axis="x")
+                exp_value = exp_value.meca.abs()
+                rec_value = features.loc[context, cycle_id, "step_width"]
+                assert rec_value == pytest.approx(
+                    exp_value,
+                    rel=1e-0), f"Expected {exp_value}, got {rec_value} in step_width for {context} context"
+
+    def test_calculation_small(self, configs, trial_small):
+        features = SpatialFeatures(configs).calculate(trial_small)
+
+        rec_value = features.loc["Left", 0, "step_length"]
+        exp_value = 532.01
+        assert rec_value == pytest.approx(
+            exp_value,
+            rel=1e-1), f"Expected {exp_value}, got {rec_value} in step_length for Left context"
+
+        rec_value = features.loc["Right", 0, "step_length"]
+        exp_value = 565.24
+        assert rec_value == pytest.approx(
+            exp_value,
+            rel=1e-1), f"Expected {exp_value}, got {rec_value} in step_length for Right context"
+
+

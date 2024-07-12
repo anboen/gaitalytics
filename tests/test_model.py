@@ -238,3 +238,20 @@ class TestSegmentedTrial:
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
         with pytest.raises(ValueError):
             segments.to_hdf5(output_file_path_small)
+
+    def test_segment_events(self, trial_small):
+        segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
+        for context in segments.get_all_cycles().keys():
+            for id, cycle in segments.get_cycles_per_context(context).items():
+                event_times = cycle.events["time"].values
+                markers = cycle.get_data(DataCategory.MARKERS)
+
+                for event_time in event_times:
+                    exp_value = markers.coords["time"][0]
+                    rec_value =  event_time
+                    assert rec_value >= exp_value, f"Expected {exp_value} time, got {rec_value}"
+
+                    exp_value = markers.coords["time"][-1]
+                    rec_value = event_time
+                    assert rec_value <= exp_value, f"Expected {exp_value} time, got {rec_value}"
+

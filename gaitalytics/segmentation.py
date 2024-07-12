@@ -153,10 +153,10 @@ class GaitEventsSegmentation(_BaseSegmentation):
             (events[io.EventInputFileReader.COLUMN_TIME] > start_time)
             & (events[io.EventInputFileReader.COLUMN_TIME] < end_time)
         ]
-        new_events[io.EventInputFileReader.COLUMN_TIME] -= start_time
 
         new_events.attrs = {
-            "end_time": end_time - start_time,
+            "end_time": end_time,
+            "start_time": start_time,
             "context": context,
             "cycle_id": cycle_id,
             "used": 1,

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -9,7 +10,7 @@ import gaitalytics.mapping as mapping
 import gaitalytics.model as model
 
 
-class BaseFeatureCalculation(ABC):
+class _CycleFeaturesCalculation(ABC):
     def __init__(self, config: mapping.MappingConfigs, **kwargs):
         """Initializes a new instance of the BaseFeatureCalculation class.
 
@@ -62,8 +63,188 @@ class BaseFeatureCalculation(ABC):
         """
         raise NotImplementedError
 
+    @staticmethod
+    def get_event_times(
+        trial_events: pd.DataFrame | None,
+    ) -> tuple[float, float, float, float, float]:
+        """Checks the sequence of events in the trial and returns the times.
 
-class TimeSeriesFeatures(BaseFeatureCalculation):
+        Args:
+            trial_events: The events to be checked and extracted.
+
+        Returns:
+            The times of the events. in following order
+            [contra_fo, contra_fs, ipsi_fo, end_time]
+
+        Raises:
+            ValueError: If the sequence of events is incorrect.
+        """
+        if trial_events is None:
+            raise ValueError("Trial does not have events.")
+        start_time = trial_events.attrs["start_time"]
+        end_time = trial_events.attrs["end_time"]
+        curren_context = trial_events.attrs["context"]
+        cycle_id = trial_events.attrs["cycle_id"]
+
+        if len(trial_events) < 3:
+            raise ValueError(
+                f"Missing events in segment {curren_context} nr. {cycle_id}"
+            )
+        ipsi_fo = trial_events[
+            trial_events[io.EventInputFileReader.COLUMN_CONTEXT] == curren_context
+        ]
+        contra = trial_events[
+            trial_events[io.EventInputFileReader.COLUMN_CONTEXT] != curren_context
+        ]
+        if len(ipsi_fo) != 1:
+            raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
+        if len(contra) != 2:
+            raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
+
+        contra_fs = contra[
+            contra[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE
+        ]
+        contra_fo = contra[
+            contra[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF
+        ]
+
+        ipsi_fo_time = ipsi_fo[io.EventInputFileReader.COLUMN_TIME].values[0]
+        contra_fs_time = contra_fs[io.EventInputFileReader.COLUMN_TIME].values[0]
+        contra_fo_time = contra_fo[io.EventInputFileReader.COLUMN_TIME].values[0]
+
+        return start_time, contra_fo_time, contra_fs_time, ipsi_fo_time, end_time
+
+    @staticmethod
+    def _create_result_from_dict(result_dict: dict) -> xr.DataArray:
+        """Create an xarray DataArray from a dictionary.
+
+        The dictionary should follow the format {feature: value}.
+        In example:
+        {
+            "min": 1.0,
+            "max": 2.0,
+            "mean": 1.5,
+            "median": 1.5,
+            "std": 0.5,
+        }
+
+        Args:
+            result_dict: The dictionary to create the DataArray from.
+
+        Returns:
+            An xarray DataArray containing the data from the dictionary.
+        """
+        xr_dict = {
+            "coords": {
+                "feature": {"dims": "feature", "data": list(result_dict.keys())}
+            },
+            "data": list(result_dict.values()),
+            "dims": "feature",
+        }
+        return xr.DataArray.from_dict(xr_dict)
+
+    @staticmethod
+    def _calculate_distance(
+        point_a: xr.DataArray,
+        point_b: xr.DataArray,
+    ) -> xr.DataArray:
+        """Calculate the distance between two points.
+
+        Args:
+            point_a: The first point.
+            point_b: The second point.
+
+        Returns:
+            An xarray DataArray containing the calculated distance.
+        """
+        return (point_b - point_a).meca.norm(dim="axis")
+
+    @staticmethod
+    def _project_point_on_vector(
+        point: xr.DataArray, vector: xr.DataArray
+    ) -> xr.DataArray:
+        """Project a point onto a vector.
+
+        Args:
+            point: The point to project.
+            vector: The vector to project onto.
+
+        Returns:
+            An xarray DataArray containing the projected point.
+        """
+        return vector * point.dot(vector, dim="axis")
+
+    @staticmethod
+    def _normalize_vector(vector: xr.DataArray) -> xr.DataArray:
+        """Normalize a vector.
+
+        Args:
+            vector: The vector to normalize.
+
+        Returns:
+            An xarray DataArray containing the normalized vector.
+        """
+        return vector / vector.meca.norm(dim="axis")
+
+
+class _PointDependentFeature(_CycleFeaturesCalculation, ABC):
+    def _get_marker_data(
+        self, trial: model.Trial, marker: mapping.MappedMarkers
+    ) -> xr.DataArray:
+        """Get the marker data for a trial.
+
+        Args:
+            trial: The trial for which to get the marker data.
+            marker: The marker to get the data for.
+            axis: The axis to get the data for.
+
+        Returns:
+            An xarray DataArray containing the marker data.
+        """
+        marker_label = self._config.get_marker_mapping(marker)
+        markers = trial.get_data(model.DataCategory.MARKERS)
+        marker_data = markers.sel(channel=marker_label)
+        return marker_data
+
+    def _get_sacrum_marker(self, trial: model.Trial) -> xr.DataArray:
+        """Get the sacrum marker data for a trial.
+
+        Try to get the sacrum marker data from the trial.
+        If the sacrum marker not found calculate from posterior hip markers
+
+        Args:
+            trial: The trial for which to get the marker data.
+
+        Returns:
+            An xarray DataArray containing the sacrum marker data.
+        """
+        try:
+            return self._get_marker_data(trial, mapping.MappedMarkers.SACRUM)
+        except KeyError:
+            l_marker = self._get_marker_data(trial, mapping.MappedMarkers.L_POST_HIP)
+            r_marker = self._get_marker_data(trial, mapping.MappedMarkers.R_POST_HIP)
+            return (l_marker + r_marker) / 2
+
+    def _get_progression_vector(self, trial: model.Trial) -> xr.DataArray:
+        """Calculate the progression vector for a trial.
+
+        The progression vector is the vector from the sacrum to the anterior hip marker.
+
+        Args:
+            trial: The trial for which to calculate the progression vector.
+
+        Returns:
+            An xarray DataArray containing the calculated progression vector.
+        """
+        sacrum_marker = self._get_sacrum_marker(trial)
+        r_ant_hip = self._get_marker_data(trial, mapping.MappedMarkers.R_ANT_HIP)
+        l_ant_hip = self._get_marker_data(trial, mapping.MappedMarkers.L_ANT_HIP)
+        ant_marker = (r_ant_hip + l_ant_hip) / 2
+
+        return (sacrum_marker - ant_marker).mean(dim="time")
+
+
+class TimeSeriesFeatures(_CycleFeaturesCalculation):
     """Calculate time series features for a trial.
 
     This class calculates following time series features for a trial.
@@ -103,7 +284,7 @@ class TimeSeriesFeatures(BaseFeatureCalculation):
         return features
 
 
-class TemporalFeatures(BaseFeatureCalculation):
+class TemporalFeatures(_CycleFeaturesCalculation):
     def _calculate(self, trial: model.Trial) -> xr.DataArray:
         """Calculate the support times for a trial.
 
@@ -120,77 +301,30 @@ class TemporalFeatures(BaseFeatureCalculation):
             ValueError: If the sequence of events is incorrect.
         """
         trial_events = trial.events
-
-        event_times = self.check_events_validity(trial_events)
-
-        result_dict = self._calculate_supports(
-            event_times[0], event_times[1], event_times[2], event_times[3]
-        )
-        result_dict["foot_off"] = event_times[2] / event_times[3]
-        result_dict["opposite_foot_off"] = event_times[0] / event_times[3]
-        result_dict["opposite_foot_contact"] = event_times[1] / event_times[3]
-        result_dict["stride_time"] = event_times[3]
-        result_dict["step_time"] = event_times[3] - event_times[1]
-        result_dict["cadence"] = 60 / (event_times[3] / 2)
-        xr_dict = {
-            "coords": {
-                "feature": {"dims": "feature", "data": list(result_dict.keys())}
-            },
-            "data": list(result_dict.values()),
-            "dims": "feature",
-        }
-        return xr.DataArray.from_dict(xr_dict)
-
-    @staticmethod
-    def check_events_validity(
-        trial_events: pd.DataFrame | None,
-    ) -> tuple[float, float, float, float]:
-        """Checks the sequence of events in the trial and returns the times.
-
-        Args:
-            trial_events: The events to be checked and extracted.
-
-        Returns:
-            The times of the events. in following order
-            [contra_fo, contra_fs, ipsi_fo, end_time]
-
-        Raises:
-            ValueError: If the sequence of events is incorrect.
-        """
         if trial_events is None:
             raise ValueError("Trial does not have events.")
 
-        end_time = trial_events.attrs["end_time"]
-        curren_context = trial_events.attrs["context"]
-        cycle_id = trial_events.attrs["cycle_id"]
+        event_times = self.get_event_times(trial_events)
 
-        if len(trial_events) < 3:
-            raise ValueError(
-                f"Missing events in segment {curren_context} nr. {cycle_id}"
-            )
-        ipsi_fo = trial_events[
-            trial_events[io.EventInputFileReader.COLUMN_CONTEXT] == curren_context
-        ]
-        contra = trial_events[
-            trial_events[io.EventInputFileReader.COLUMN_CONTEXT] != curren_context
-        ]
-        if len(ipsi_fo) != 1:
-            raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
-        if len(contra) != 2:
-            raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
-
-        contra_fs = contra[
-            contra[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE
-        ]
-        contra_fo = contra[
-            contra[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF
+        rel_event_times = [
+            event_time - float(trial_events.attrs["start_time"])
+            for event_time in event_times
         ]
 
-        ipsi_fo_time = ipsi_fo[io.EventInputFileReader.COLUMN_TIME].values[0]
-        contra_fs_time = contra_fs[io.EventInputFileReader.COLUMN_TIME].values[0]
-        contra_fo_time = contra_fo[io.EventInputFileReader.COLUMN_TIME].values[0]
+        result_dict = self._calculate_supports(
+            rel_event_times[1],
+            rel_event_times[2],
+            rel_event_times[3],
+            rel_event_times[4],
+        )
+        result_dict["foot_off"] = rel_event_times[3] / rel_event_times[4]
+        result_dict["opposite_foot_off"] = rel_event_times[1] / rel_event_times[4]
+        result_dict["opposite_foot_contact"] = rel_event_times[2] / rel_event_times[4]
+        result_dict["stride_time"] = rel_event_times[4]
+        result_dict["step_time"] = rel_event_times[4] - rel_event_times[2]
+        result_dict["cadence"] = 60 / (rel_event_times[4] / 2)
 
-        return contra_fo_time, contra_fs_time, ipsi_fo_time, end_time
+        return self._create_result_from_dict(result_dict)
 
     @staticmethod
     def _calculate_supports(
@@ -213,3 +347,103 @@ class TemporalFeatures(BaseFeatureCalculation):
         double_support = (contra_fo_time + (ipsi_fo_time - contra_fs_time)) / end_time
         single_support = (contra_fs_time - contra_fo_time) / end_time
         return {"double_support": double_support, "single_support": single_support}
+
+
+class SpatialFeatures(_PointDependentFeature):
+    def _calculate(self, trial: model.Trial) -> xr.DataArray:
+        """Calculate the spatial features for a trial.
+
+        Definitions of the spatial features
+        Hollmann et al. 2011 (doi: 10.1016/j.gaitpost.2011.03.024)
+
+        Args:
+            trial: The trial for which to calculate the features.
+
+        Returns:
+            An xarray DataArray containing the calculated features.
+
+        Raises:
+            ValueError: If the trial does not have events.
+        """
+
+        if trial.events is None:
+            raise ValueError("Trial does not have events.")
+
+        if trial.events.attrs["context"] == "Right":
+            ipsi_marker = mapping.MappedMarkers.R_TOE
+            contra_marker = mapping.MappedMarkers.L_TOE
+        else:
+            ipsi_marker = mapping.MappedMarkers.R_TOE
+            contra_marker = mapping.MappedMarkers.L_TOE
+
+        results_dict = self._calculate_step_length(trial, ipsi_marker, contra_marker)
+        results_dict.update(
+            self._calculate_step_width(trial, ipsi_marker, contra_marker)
+        )
+        return self._create_result_from_dict(results_dict)
+
+    def _calculate_step_length(
+        self,
+        trial: model.Trial,
+        ipsi_marker: mapping.MappedMarkers,
+        contra_marker: mapping.MappedMarkers,
+    ) -> dict[str, np.ndarray]:
+        """Calculate the step length for a trial.
+
+        Args:
+            trial: The trial for which to calculate the step length.
+            ipsi_marker: The ipsi-lateral heel marker.
+            contra_marker: The contra-lateral heel marker.
+
+
+        Returns:
+            The calculated step length.
+        """
+
+        event_times = self.get_event_times(trial.events)
+
+        ipsi_heel = self._get_marker_data(trial, ipsi_marker).sel(
+            time=event_times[-1], method="nearest"
+        )
+        contra_heel = self._get_marker_data(trial, contra_marker).sel(
+            time=event_times[-1], method="nearest"
+        )
+        progress_axis = self._get_progression_vector(trial)
+        progress_axis = self._normalize_vector(progress_axis)
+        projected_ipsi = self._project_point_on_vector(ipsi_heel, progress_axis)
+        projected_contra = self._project_point_on_vector(contra_heel, progress_axis)
+        distance = self._calculate_distance(projected_ipsi, projected_contra).values
+        return {"step_length": distance}
+
+    def _calculate_step_width(
+        self,
+        trial: model.Trial,
+        ipsi_marker: mapping.MappedMarkers,
+        contra_marker: mapping.MappedMarkers,
+    ) -> dict[str, np.ndarray]:
+        """Calculate the step width for a trial.
+
+        Args:
+            trial: The trial for which to calculate the step width.
+            ipsi_marker: The ipsi-lateral heel marker.
+            contra_marker: The contra-lateral heel marker.
+
+        Returns:
+            The calculated step width in a dict.
+        """
+
+        event_times = self.get_event_times(trial.events)
+        contra_heel = self._get_marker_data(trial, contra_marker)
+        contra_vector = contra_heel.sel(
+            time=event_times[2], method="nearest"
+        ) - contra_heel.sel(time=event_times[0], method="nearest")
+
+        ipsi_heel = self._get_marker_data(trial, ipsi_marker).sel(
+            time=event_times[-1], method="nearest"
+        )
+
+        norm_vector = self._normalize_vector(contra_vector)
+        projected_ipsi = self._project_point_on_vector(ipsi_heel, norm_vector)
+        distance = self._calculate_distance(ipsi_heel, projected_ipsi).values
+
+        return {"step_width": distance}
