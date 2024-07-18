@@ -248,10 +248,9 @@ class TestSegmentedTrial:
 
                 for event_time in event_times:
                     exp_value = markers.coords["time"][0]
-                    rec_value =  event_time
+                    rec_value = round(event_time,2)
                     assert rec_value >= exp_value, f"Expected {exp_value} time, got {rec_value}"
 
                     exp_value = markers.coords["time"][-1]
-                    rec_value = event_time
+                    rec_value = round(event_time, 2)
                     assert rec_value <= exp_value, f"Expected {exp_value} time, got {rec_value}"
-

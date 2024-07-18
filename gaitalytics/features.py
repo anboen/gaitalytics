@@ -8,6 +8,8 @@ import gaitalytics.events as events
 import gaitalytics.io as io
 import gaitalytics.mapping as mapping
 import gaitalytics.model as model
+import gaitalytics.utils.linalg as linalg
+import gaitalytics.utils.mocap as mocap
 
 
 class _CycleFeaturesCalculation(ABC):
@@ -81,8 +83,6 @@ class _CycleFeaturesCalculation(ABC):
         """
         if trial_events is None:
             raise ValueError("Trial does not have events.")
-        start_time = trial_events.attrs["start_time"]
-        end_time = trial_events.attrs["end_time"]
         curren_context = trial_events.attrs["context"]
         cycle_id = trial_events.attrs["cycle_id"]
 
@@ -90,13 +90,13 @@ class _CycleFeaturesCalculation(ABC):
             raise ValueError(
                 f"Missing events in segment {curren_context} nr. {cycle_id}"
             )
-        ipsi_fo = trial_events[
+        ipsi = trial_events[
             trial_events[io.EventInputFileReader.COLUMN_CONTEXT] == curren_context
         ]
         contra = trial_events[
             trial_events[io.EventInputFileReader.COLUMN_CONTEXT] != curren_context
         ]
-        if len(ipsi_fo) != 1:
+        if len(ipsi) != 3:
             raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
         if len(contra) != 2:
             raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
@@ -107,16 +107,26 @@ class _CycleFeaturesCalculation(ABC):
         contra_fo = contra[
             contra[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF
         ]
+        ipsi_fs = ipsi[ipsi[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE]
+        ipsi_fo = ipsi[ipsi[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF]
 
+        ipsi_fs_time_start = ipsi_fs[io.EventInputFileReader.COLUMN_TIME].values[0]
+        ipsi_fs_time_end = ipsi_fs[io.EventInputFileReader.COLUMN_TIME].values[1]
         ipsi_fo_time = ipsi_fo[io.EventInputFileReader.COLUMN_TIME].values[0]
         contra_fs_time = contra_fs[io.EventInputFileReader.COLUMN_TIME].values[0]
         contra_fo_time = contra_fo[io.EventInputFileReader.COLUMN_TIME].values[0]
 
-        return start_time, contra_fo_time, contra_fs_time, ipsi_fo_time, end_time
+        return (
+            ipsi_fs_time_start,
+            contra_fo_time,
+            contra_fs_time,
+            ipsi_fo_time,
+            ipsi_fs_time_end,
+        )
 
     @staticmethod
     def _create_result_from_dict(result_dict: dict) -> xr.DataArray:
-        """Create an xarray DataArray from a dictionary.
+        """Create a xarray DataArray from a dictionary.
 
         The dictionary should follow the format {feature: value}.
         In example:
@@ -143,49 +153,6 @@ class _CycleFeaturesCalculation(ABC):
         }
         return xr.DataArray.from_dict(xr_dict)
 
-    @staticmethod
-    def _calculate_distance(
-        point_a: xr.DataArray,
-        point_b: xr.DataArray,
-    ) -> xr.DataArray:
-        """Calculate the distance between two points.
-
-        Args:
-            point_a: The first point.
-            point_b: The second point.
-
-        Returns:
-            An xarray DataArray containing the calculated distance.
-        """
-        return (point_b - point_a).meca.norm(dim="axis")
-
-    @staticmethod
-    def _project_point_on_vector(
-        point: xr.DataArray, vector: xr.DataArray
-    ) -> xr.DataArray:
-        """Project a point onto a vector.
-
-        Args:
-            point: The point to project.
-            vector: The vector to project onto.
-
-        Returns:
-            An xarray DataArray containing the projected point.
-        """
-        return vector * point.dot(vector, dim="axis")
-
-    @staticmethod
-    def _normalize_vector(vector: xr.DataArray) -> xr.DataArray:
-        """Normalize a vector.
-
-        Args:
-            vector: The vector to normalize.
-
-        Returns:
-            An xarray DataArray containing the normalized vector.
-        """
-        return vector / vector.meca.norm(dim="axis")
-
 
 class _PointDependentFeature(_CycleFeaturesCalculation, ABC):
     def _get_marker_data(
@@ -196,15 +163,11 @@ class _PointDependentFeature(_CycleFeaturesCalculation, ABC):
         Args:
             trial: The trial for which to get the marker data.
             marker: The marker to get the data for.
-            axis: The axis to get the data for.
 
         Returns:
             An xarray DataArray containing the marker data.
         """
-        marker_label = self._config.get_marker_mapping(marker)
-        markers = trial.get_data(model.DataCategory.MARKERS)
-        marker_data = markers.sel(channel=marker_label)
-        return marker_data
+        return mocap.get_marker_data(trial, self._config, marker)
 
     def _get_sacrum_marker(self, trial: model.Trial) -> xr.DataArray:
         """Get the sacrum marker data for a trial.
@@ -218,12 +181,7 @@ class _PointDependentFeature(_CycleFeaturesCalculation, ABC):
         Returns:
             An xarray DataArray containing the sacrum marker data.
         """
-        try:
-            return self._get_marker_data(trial, mapping.MappedMarkers.SACRUM)
-        except KeyError:
-            l_marker = self._get_marker_data(trial, mapping.MappedMarkers.L_POST_HIP)
-            r_marker = self._get_marker_data(trial, mapping.MappedMarkers.R_POST_HIP)
-            return (l_marker + r_marker) / 2
+        return mocap.get_sacrum_marker(trial, self._config)
 
     def _get_progression_vector(self, trial: model.Trial) -> xr.DataArray:
         """Calculate the progression vector for a trial.
@@ -236,12 +194,7 @@ class _PointDependentFeature(_CycleFeaturesCalculation, ABC):
         Returns:
             An xarray DataArray containing the calculated progression vector.
         """
-        sacrum_marker = self._get_sacrum_marker(trial)
-        r_ant_hip = self._get_marker_data(trial, mapping.MappedMarkers.R_ANT_HIP)
-        l_ant_hip = self._get_marker_data(trial, mapping.MappedMarkers.L_ANT_HIP)
-        ant_marker = (r_ant_hip + l_ant_hip) / 2
-
-        return (sacrum_marker - ant_marker).mean(dim="time")
+        return mocap.get_progression_vector(trial, self._config)
 
 
 class TimeSeriesFeatures(_CycleFeaturesCalculation):
@@ -304,12 +257,7 @@ class TemporalFeatures(_CycleFeaturesCalculation):
         if trial_events is None:
             raise ValueError("Trial does not have events.")
 
-        event_times = self.get_event_times(trial_events)
-
-        rel_event_times = [
-            event_time - float(trial_events.attrs["start_time"])
-            for event_time in event_times
-        ]
+        rel_event_times = self.get_event_times(trial_events)
 
         result_dict = self._calculate_supports(
             rel_event_times[1],
@@ -409,10 +357,10 @@ class SpatialFeatures(_PointDependentFeature):
             time=event_times[-1], method="nearest"
         )
         progress_axis = self._get_progression_vector(trial)
-        progress_axis = self._normalize_vector(progress_axis)
-        projected_ipsi = self._project_point_on_vector(ipsi_heel, progress_axis)
-        projected_contra = self._project_point_on_vector(contra_heel, progress_axis)
-        distance = self._calculate_distance(projected_ipsi, projected_contra).values
+        progress_axis = linalg.normalize_vector(progress_axis)
+        projected_ipsi = linalg.project_point_on_vector(ipsi_heel, progress_axis)
+        projected_contra = linalg.project_point_on_vector(contra_heel, progress_axis)
+        distance = linalg.calculate_distance(projected_ipsi, projected_contra).values
         return {"step_length": distance}
 
     def _calculate_step_width(
@@ -442,8 +390,8 @@ class SpatialFeatures(_PointDependentFeature):
             time=event_times[-1], method="nearest"
         )
 
-        norm_vector = self._normalize_vector(contra_vector)
-        projected_ipsi = self._project_point_on_vector(ipsi_heel, norm_vector)
-        distance = self._calculate_distance(ipsi_heel, projected_ipsi).values
+        norm_vector = linalg.normalize_vector(contra_vector)
+        projected_ipsi = linalg.project_point_on_vector(ipsi_heel, norm_vector)
+        distance = linalg.calculate_distance(ipsi_heel, projected_ipsi).values
 
         return {"step_width": distance}

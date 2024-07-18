@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
 requires-python = ">= 3.12"
-dependencies = ["netcdf4", "pandas", "tables", "h5py", "pyyaml"]
+dependencies = ["netcdf4", "pandas", "tables", "h5py", "pyyaml", "scipy"]
 
 [tool.setuptools_scm]
 

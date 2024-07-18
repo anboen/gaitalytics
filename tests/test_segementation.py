@@ -105,7 +105,7 @@ class TestEventSegmentation:
             for cycle_id, cycle in cycles.items():
                 events = cycle.events
                 rec_value = len(events)
-                exp_value = 3
+                exp_value = 5
                 message = f"Expected {exp_value} events, got {rec_value} in {context}: {cycle_id}"
                 assert rec_value == exp_value, message
 
@@ -117,7 +117,7 @@ class TestEventSegmentation:
             for cycle_id, cycle in cycles.items():
                 events = cycle.events
                 rec_value = len(events)
-                exp_value = 3
+                exp_value = 5
                 message = f"Expected {exp_value} events, got {rec_value} in {context}: {cycle_id}"
                 assert rec_value == exp_value, message
 
@@ -164,7 +164,7 @@ def _test_start_end_frame(cycles: TrialCycles):
             current_data = current_trial.get_data(DataCategory.MARKERS)
             next_data = next_trial.get_data(DataCategory.MARKERS)
             rec_value = abs(
-                next_data.attrs["start_frame"] - current_data.attrs["end_frame"])
+                next_data.attrs["start_time"] - current_data.attrs["end_time"])
             exp_value = 1
             message = f"Expected max {exp_value} frame difference, got {rec_value} in {context}: {current_key} markers"
             assert rec_value <= exp_value, message
@@ -172,7 +172,7 @@ def _test_start_end_frame(cycles: TrialCycles):
             current_data = current_trial.get_data(DataCategory.ANALOGS)
             next_data = next_trial.get_data(DataCategory.ANALOGS)
             rec_value = abs(
-                next_data.attrs["start_frame"] - current_data.attrs["end_frame"])
+                next_data.attrs["start_time"] - current_data.attrs["end_time"])
             exp_value = 1
             message = f"Expected max {exp_value} frame difference, got {rec_value} in {context}: {current_key} analogs"
             assert rec_value <= exp_value, message

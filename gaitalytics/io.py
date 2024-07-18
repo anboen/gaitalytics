@@ -100,7 +100,9 @@ class C3dEventInputFileReader(EventInputFileReader):
                 self.COLUMN_ICON: icons,
             }
         )
-        table = table.sort_values(by=self.COLUMN_TIME, ascending=True)
+        table = table.sort_values(by=self.COLUMN_TIME, ascending=True).reset_index(
+            drop=True
+        )
         return table
 
     def _get_event_labels(self) -> list[str]:

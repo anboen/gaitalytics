@@ -6,12 +6,14 @@ gait events as well as a base class to implement additional methods.
 
 from abc import ABC, abstractmethod
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
 import gaitalytics.events as ga_events
 import gaitalytics.io as io
 import gaitalytics.model as model
+import gaitalytics.utils.math as ga_math
 
 
 class _BaseSegmentation(ABC):
@@ -115,11 +117,24 @@ class GaitEventsSegmentation(_BaseSegmentation):
         Returns:
             A new trial containing the segmented data.
         """
+
         trial_segment = model.Trial()
         # segment the data
         for category, data in trial.get_all_data().items():
-            segment = data.sel(time=slice(start_time, end_time))
-            self._update_attrs(segment, cycle_id, context)
+            rate = int(data.attrs["rate"])
+            dec_places = ga_math.get_decimal_places(1 / rate)
+            round_start = round(start_time, dec_places)
+            round_end = round(end_time, dec_places)
+
+            segment = data.sel(time=slice(round_start, round_end))
+            segment = segment.reset_index("time")
+
+            times = (segment.time.round(rate) - round_start).round(rate).to_numpy()
+            times = np.round(times, dec_places)
+            times = np.absolute(times)
+
+            segment = segment.assign_coords(time=times)
+            self._update_attrs(segment, start_time, end_time, cycle_id, context)
             trial_segment.add_data(category, segment)
         # segment the events
         trial_segment.events = self._segment_events(
@@ -150,10 +165,10 @@ class GaitEventsSegmentation(_BaseSegmentation):
         if events is None:
             raise ValueError("Events are not set.")
         new_events = events[
-            (events[io.EventInputFileReader.COLUMN_TIME] > start_time)
-            & (events[io.EventInputFileReader.COLUMN_TIME] < end_time)
+            (events[io.EventInputFileReader.COLUMN_TIME] >= start_time)
+            & (events[io.EventInputFileReader.COLUMN_TIME] <= end_time)
         ]
-
+        new_events.time -= start_time
         new_events.attrs = {
             "end_time": end_time,
             "start_time": start_time,
@@ -164,7 +179,9 @@ class GaitEventsSegmentation(_BaseSegmentation):
         return new_events
 
     @staticmethod
-    def _update_attrs(segment: xr.DataArray, cycle_id: int, context: str):
+    def _update_attrs(
+        segment: xr.DataArray, start_time, end_time, cycle_id: int, context: str
+    ):
         """Updates the attributes of the segment based on the data.
 
         Updates time, and frames to relative values. Add additional information
@@ -176,15 +193,9 @@ class GaitEventsSegmentation(_BaseSegmentation):
             cycle_id: The cycle id of the segment.
             context: The context of the segment.
         """
-        start_frame = round(
-            segment.coords["time"][0].data / (1 / segment.attrs["rate"]), 0
-        )
-        end_frame = round(
-            segment.coords["time"][-1].data / (1 / segment.attrs["rate"]), 0
-        )
 
-        segment.attrs["start_frame"] = start_frame
-        segment.attrs["end_frame"] = end_frame
+        segment.attrs["start_time"] = start_time
+        segment.attrs["end_time"] = end_time
         segment.attrs["cycle_id"] = cycle_id
         segment.attrs["context"] = context
         # netcdf can not handle booleans :(
