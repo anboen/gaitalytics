@@ -283,15 +283,15 @@ class MarkerEventDetection(_BaseEventDetection):
             xr.DataArray: The rotated point.
         """
         fix = fix_point.drop_sel(axis="z")
-        point = point.drop_sel(axis="z")
+        rel_point = point.drop_sel(axis="z")
         rot = np.array(
             [[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]
         )
         rel_fix = fix.to_numpy()
-        rel_point = point.to_numpy()
-        two_d_point = np.empty(rel_point.shape)
-        for i in range(rel_point.shape[1]):
-            two_d_point[:, i] = rel_point[:, i] - rel_fix[:, i]
+        np_rel_point = rel_point.to_numpy()
+        two_d_point = np.empty(np_rel_point.shape)
+        for i in range(np_rel_point.shape[1]):
+            two_d_point[:, i] = np_rel_point[:, i] - rel_fix[:, i]
             two_d_point[:, i] = two_d_point[:, i] @ rot[:, :, i].T
             two_d_point[:, i] = two_d_point[:, i] + rel_fix[:, i]
         point = point.copy(deep=True)

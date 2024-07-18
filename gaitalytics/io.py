@@ -386,7 +386,3 @@ class AnalysisInputReader(_PyomecaInputFileReader):
             An xarray DataArray containing the analysis data.
         """
         return self._data
-
-
-# Event to C3d Section
-# TODO: Add c3d event writer
