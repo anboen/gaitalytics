@@ -10,5 +10,8 @@ def get_decimal_places(number: float) -> int:
     Returns:
         The number of decimal places in the number.
     """
-    places = abs(decimal.Decimal(str(number)).as_tuple().exponent)
-    return places
+    places = decimal.Decimal(str(number)).as_tuple().exponent
+    if type(places) is not int:
+        raise ValueError("The number of decimal places must be an integer.")
+
+    return abs(places)

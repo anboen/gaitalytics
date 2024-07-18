@@ -175,6 +175,7 @@ class C3dEventInputFileReader(EventInputFileReader):
                 # convert TIMES: c3d specifics values[0] as
                 # minutes and values[1] as seconds
                 current_values = current_values[1] + (current_values[0] * 60)
+                current_values = np.round(current_values, 3)
             if type(current_values) is np.ndarray:
                 current_values = current_values.tolist()
             values += current_values
