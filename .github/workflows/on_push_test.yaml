@@ -12,6 +12,7 @@ jobs:
         with:
           pixi-version: v0.25.0
           cache: false
+      - run: pixi list
       - run: pixi run test
   Mac64-Tests:
     runs-on: macOS-13
@@ -23,6 +24,7 @@ jobs:
         with:
           pixi-version: v0.25.0
           cache: false
+      - run: pixi list
       - run: pixi run test
   MacArm-Tests:
     runs-on: macOS-latest
@@ -34,5 +36,18 @@ jobs:
         with:
           pixi-version: v0.25.0
           cache: false
+      - run: pixi list
+      - run: pixi run test
+  Linux-Tests:
+    runs-on: linux-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          pixi-version: v0.25.0
+          cache: false
+      - run: pixi list
       - run: pixi run test
 
