@@ -11,19 +11,21 @@ import xarray as xr
 
 import gaitalytics.mapping as mapping
 
+_MAX_EVENTS_PER_SECTION = 255
+
 
 # Input Section
-class _BaseInputFileReader:
-    """Base class for input file readers.
+class _BaseFileHandler:
+    """Base class for file handler.
 
-    This class provides a common interface for reading input files.
+    This class provides a common interface for file handlers.
 
     Attributes:
-        file_path: The path to the input file.
+        file_path: The path to the  file.
     """
 
     def __init__(self, file_path: Path):
-        """Initialize a new instance of the _BaseInputFileReader class.
+        """Initialize a new instance of the _BaseFileHandler class.
 
         Args:
             file_path: The path to the input file.
@@ -31,7 +33,71 @@ class _BaseInputFileReader:
         self.file_path = file_path
 
 
-class EventInputFileReader(_BaseInputFileReader):
+class _EventFileWriter(_BaseFileHandler):
+
+    @abstractmethod
+    def write_events(self, events: pd.DataFrame, file_path: Path | None = None):
+        """Write the events to the output file.
+
+        Args:
+            events: The events to write to the output file.
+            file_path: The path to the output file if deviating from the input file.
+        """
+        raise NotImplementedError
+
+
+class C3dEventFileWriter(_EventFileWriter):
+    """A class for handling C3D files in an easy and convenient way."""
+
+    _CONTEXT_SECTION = "CONTEXTS"
+    _ICON_SECTION = "ICON_IDS"
+    _LABEL_SECTION = "LABELS"
+    _TIME_SECTION = "TIMES"
+
+    def write_events(self, events: pd.DataFrame, file_path: Path | None = None):
+        """Write the events to the output file.
+
+        Args:
+            events: The events to write to the output file.
+            file_path: The path to the output file if deviating from the input file.
+        """
+        c3d = ezc3d.c3d()
+        n_sections = len(events) // _MAX_EVENTS_PER_SECTION
+        for i in range(n_sections):
+            start = i * _MAX_EVENTS_PER_SECTION
+            end = (i + 1) * _MAX_EVENTS_PER_SECTION
+            if end > len(events):
+                end = len(events) - 1
+
+            context_label = self._CONTEXT_SECTION
+            icon_label = self._ICON_SECTION
+            label_label = self._LABEL_SECTION
+            time_label = self._TIME_SECTION
+
+            if i > 0:
+                context_label += f"_{i + 1}"
+                icon_label += f"_{i + 1}"
+                label_label += f"_{i + 1}"
+                time_label += f"_{i + 1}"
+            subset_events = events.iloc[start:end]
+            c3d.add_parameter("EVENT",
+                              context_label,
+                              subset_events["context"].tolist())
+            c3d.add_parameter("EVENT",
+                              icon_label,
+                              subset_events["icon_id"].tolist())
+            c3d.add_parameter("EVENT",
+                              label_label,
+                              subset_events["label"].tolist())
+
+            times = [[time // 60, time % 60] for time in subset_events["time"].tolist()]
+            c3d.add_parameter("EVENT", time_label, times)
+        c3d.add_parameter("EVENT", "used", len(events))
+        path = file_path if file_path else self.file_path
+        c3d.write(str(path))
+
+
+class EventInputFileReader(_BaseFileHandler):
     """Abstract base class for reading event input files.
 
     This class defines the interface for reading event input files
@@ -61,8 +127,6 @@ class C3dEventInputFileReader(EventInputFileReader):
 
     Implements the EventInputFileReader interface to read events from C3D files.
     """
-
-    _MAX_EVENTS_PER_SECTION = 255
 
     def __init__(self, file_path: Path):
         """Initializes a new instance of the EzC3dFileHandler class.
@@ -182,14 +246,15 @@ class C3dEventInputFileReader(EventInputFileReader):
         return values
 
 
-class _PyomecaInputFileReader(_BaseInputFileReader):
+class _PyomecaInputFileReader(_BaseFileHandler):
     """Base class for handling input files using pyomeca.
 
     This class provides a common interface for reading input files with pyomeca.
     """
 
     def __init__(
-        self, file_path: Path, pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
+            self, file_path: Path,
+            pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
     ):
         """Initializes a new instance of the MarkersInputFileReader class.
 
@@ -204,7 +269,7 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
         """
         file_ext = file_path.suffix
         if file_ext == ".c3d" and (
-            pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
+                pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
         ):
             data = pyomeca_class.from_c3d(file_path)
         elif file_ext == ".trc" and pyomeca_class == pyomeca.Markers:
@@ -230,7 +295,7 @@ class _PyomecaInputFileReader(_BaseInputFileReader):
 
     @staticmethod
     def _to_absolute_time(
-        data: xr.DataArray, first_frame: int, rate: float
+            data: xr.DataArray, first_frame: int, rate: float
     ) -> xr.DataArray:
         """Converts the time to absolute time.
 

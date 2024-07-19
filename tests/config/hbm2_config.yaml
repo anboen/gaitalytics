@@ -1,0 +1,21 @@
+# Markers to analyse
+
+analysis:
+  markers:
+mapping:
+  markers:
+    # Foot
+    l_heel: "LHEE"
+    r_heel: "RHEE"
+    l_toe: "LMT2"
+    r_toe: "RMT2"
+
+    # Hip
+    l_ant_hip: "LASIS"
+    r_ant_hip: "RASIS"
+    l_post_hip: "LPSIS"
+    r_post_hip: "RPSIS"
+
+
+
+

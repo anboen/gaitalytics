@@ -4,9 +4,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from gaitalytics.events import MarkerEventDetection
 from gaitalytics.io import C3dEventInputFileReader, MarkersInputFileReader, \
-    AnalogsInputFileReader, AnalysisInputReader
+    AnalogsInputFileReader, AnalysisInputReader, C3dEventFileWriter
 from gaitalytics.mapping import MappingConfigs
+from gaitalytics.model import Trial, DataCategory
 
 INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
 INPUT_TRC_SMALL: Path = Path('tests/data/test_small.trc')
@@ -15,8 +17,29 @@ INPUT_STO_SMALL: Path = Path('tests/data/test_small.sto')
 
 INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
 
+INPUT_HBM2: Path = Path('tests/data/test_hbm2_small.c3d')
 
-class TestEvents:
+
+@pytest.fixture()
+def out_path(request):
+    out = Path('out/test_small_events.c3d')
+    if out.exists():
+        out.unlink()
+    return out
+
+
+class TestWriteEvents:
+
+    def test_write_c3d_events_small(self, out_path):
+        configs = MappingConfigs(Path('tests/config/hbm2_config.yaml'))
+        markers = MarkersInputFileReader(INPUT_HBM2).get_markers()
+        trial = Trial()
+        trial.add_data(DataCategory.MARKERS, markers)
+        events = MarkerEventDetection(configs).detect_events(trial)
+        C3dEventFileWriter(INPUT_HBM2).write_events(events, out_path)
+
+
+class TestReadEvents:
     def test_c3d_events_small(self):
         c3d_events = C3dEventInputFileReader(INPUT_C3D_SMALL)
         events = c3d_events.get_events()
