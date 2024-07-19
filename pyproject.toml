@@ -7,27 +7,34 @@ name = "gaitalytics"
 dynamic = ["version"]
 description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
-requires-python = ">= 3.12"
-dependencies = ["netcdf4", "pandas", "tables", "h5py", "pyyaml", "scipy"]
+requires-python = ">= 3.10"
+dependencies = []
 
 [tool.setuptools_scm]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "cleanpy", "pip", "pandas-stubs", "ruff", "mypy"]
-build = ["twine", "setuptools", "setuptools_scm", "build", "cleanpy"]
+test = ["pytest", "pytest-cov", "cleanpy", "pandas-stubs", "ruff", "mypy"]
+build = ["twine", "build", "cleanpy"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints", "sphinx_github_changelog"]
 
 [tool.pixi.project]
-channels = ["conda-forge"]
-platforms = ["win-64", "linux-64"]
+channels = ["default", "conda-forge"]
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tool.pixi.pypi-dependencies]
 gaitalytics = { path = ".", editable = true }
+netcdf4 = ">=1.6.4,<1.7"
+h5py = ">=3.11.0,<3.12"
 
 [tool.pixi.dependencies]
 pyomeca = ">=2021.0.1,<2021.1"
+pandas = ">=2.2.2,<2.3"
+pyyaml = ">=6.0.1,<6.1"
+scipy = ">=1.14.0,<1.15"
+numpy = ">=1.26.4,<2.1"
+ezc3d = ">=1.5.10,<1.6"
+xarray = ">=2024.6.0,<2024.7"
 pixi-pycharm = ">=0.0.6,<0.1"
-
 
 # Environments
 [tool.pixi.environments]

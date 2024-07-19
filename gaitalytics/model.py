@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from pathlib import Path
 
-import h5py
+import netCDF4 as netcdf
 import pandas as pd
 import xarray as xr
 
@@ -363,9 +363,9 @@ def _load_segmented_trial_file(file_path: Path) -> TrialCycles:
     trial_cycles = TrialCycles()
 
     for file in file_path.glob("**/*.h5"):
-        with h5py.File(str(file), "r") as f:
+        with netcdf.Dataset(str(file), "r") as f:
             cycle_id = file.name.replace(".h5", "")
-            for context in f.keys():
+            for context in f.groups.keys():
                 trial = _load_trial(f[context], file)
                 trial_cycles.add_cycle(context, int(cycle_id), trial)
     return trial_cycles
@@ -389,13 +389,13 @@ def _load_trial_file(file_path: Path) -> Trial:
     Args:
         file_path: The path to the HDF5 file.
     """
-    with h5py.File(str(file_path), "r") as f:
+    with netcdf.Dataset(file_path, "r") as f:
         trial = _load_trial(f, file_path)
 
     return trial
 
 
-def _load_trial(group: h5py, file_path: Path) -> Trial:
+def _load_trial(group: netcdf.Dataset, file_path: Path) -> Trial:
     """Loads a trial from an HDF5 group.
 
     following structure is expected:
@@ -419,14 +419,14 @@ def _load_trial(group: h5py, file_path: Path) -> Trial:
     correct_file_format = False
     trial = Trial()
     for category in DataCategory:
-        if category.value in group.keys():
+        if category.value in group.groups.keys():
             with xr.load_dataarray(
                 file_path, group=f"{group.name}/{category.value}"
             ) as data:
                 trial.add_data(category, data)
 
             correct_file_format = True
-    if "events" in group.keys():
+    if "events" in group.groups.keys():
         with xr.load_dataset(file_path, group=f"{group.name}/events") as events:
             trial.events = events.to_dataframe()
         correct_file_format = True

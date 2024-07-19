@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 
-import h5py
+import netCDF4 as netcdf
 import pytest
 import xarray as xr
 
@@ -152,8 +152,8 @@ class TestTrial:
 
         assert output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"
 
-        with h5py.File(output_file_path_small, 'r') as f:
-            rec_value = len(f.keys())
+        with netcdf.Dataset(output_file_path_small, 'r') as f:
+            rec_value = len(f.groups.keys())
             exp_value = 4
             assert rec_value == exp_value, f"Expected {exp_value} datasets, got {rec_value}"
 
@@ -174,8 +174,8 @@ class TestTrial:
 
         assert output_file_path_big.exists(), f"Expected {output_file_path_big} to exist, but it does not"
 
-        with h5py.File(output_file_path_big, 'r') as f:
-            rec_value = len(f.keys())
+        with netcdf.Dataset(output_file_path_big, 'r') as f:
+            rec_value = len(f.groups.keys())
             exp_value = 4
             assert rec_value == exp_value, f"Expected {exp_value} datasets, got {rec_value}"
 

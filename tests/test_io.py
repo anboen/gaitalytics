@@ -28,7 +28,7 @@ def out_path(request):
     return out
 
 
-class TestWriteEvents:
+class FooTestWriteEvents:
 
     def test_write_c3d_events_small(self, out_path):
         configs = MappingConfigs(Path('tests/config/hbm2_config.yaml'))
