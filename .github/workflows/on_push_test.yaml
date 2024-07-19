@@ -39,7 +39,7 @@ jobs:
       - run: pixi list
       - run: pixi run test
   Linux-Tests:
-    runs-on: linux-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
