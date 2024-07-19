@@ -1,9 +1,9 @@
-name: GitHub Actions Demo
+name: Code Tests
 run-name: ${{ github.actor }} is testing the code
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
+  Windows-Tests:
+    runs-on: windows-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
