@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
 requires-python = ">= 3.11"
-dependencies = []
+dependencies = ["netcdf4"]
 
 [tool.setuptools_scm]
 
@@ -25,7 +25,6 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 [tool.pixi.pypi-dependencies]
 gaitalytics = { path = ".", editable = true }
 
-
 [tool.pixi.dependencies]
 pyomeca = ">=2021.0.1,<2021.1"
 pandas = ">=2.2.2,<2.3"
@@ -35,7 +34,6 @@ numpy = ">=1.26.4,<2.1"
 ezc3d = { version = ">=1.5.10,<1.6", build = "*python*" }
 xarray = ">=2024.6.0,<2024.7"
 pixi-pycharm = ">=0.0.6,<0.1"
-netcdf4 = ">=1.7.1,<1.8"
 
 # Environments
 [tool.pixi.environments]
