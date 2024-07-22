@@ -7,7 +7,7 @@ name = "gaitalytics"
 dynamic = ["version"]
 description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
-requires-python = ">= 3.10"
+requires-python = ">= 3.11"
 dependencies = []
 
 [tool.setuptools_scm]
@@ -39,10 +39,10 @@ netcdf4 = ">=1.6.4,<1.7"
 
 # Environments
 [tool.pixi.environments]
-default = {features = ["test", "dev", "py310"], solve-group = "default" }
-build = { features = ["build", "py310"], solve-group = "default" }
-docs = { features = ["docs", "py310"], solve-group = "default" }
-py310 = { features = ["py310", "test"], solve-group = "default" }
+default = {features = ["test", "dev", "py311"], solve-group = "default" }
+build = { features = ["build", "py311"], solve-group = "default" }
+docs = { features = ["docs", "py311"], solve-group = "default" }
+py310 = { features = ["py311", "test"], solve-group = "default" }
 
 [tool.pixi.feature.py310.dependencies]
 python = ">=3.10,<3.11"
@@ -80,7 +80,7 @@ select = [
 pydocstyle = "google"
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 ignore_missing_imports = "True"
 
 
