@@ -88,22 +88,22 @@ class GaitEventsSegmentation(_BaseSegmentation):
         splits = {}
         interesting_events = events[
             events[io.EventInputFileReader.COLUMN_LABEL] == self.event_label
-            ]
+        ]
         contexts = events[io.EventInputFileReader.COLUMN_CONTEXT].unique()
         for context in contexts:
             context_events = interesting_events[
                 interesting_events[io.EventInputFileReader.COLUMN_CONTEXT] == context
-                ]
+            ]
             splits[context] = context_events[io.EventInputFileReader.COLUMN_TIME].values
         return splits
 
     def _get_segment(
-            self,
-            trial: model.Trial,
-            start_time: float,
-            end_time: float,
-            cycle_id: int,
-            context: str,
+        self,
+        trial: model.Trial,
+        start_time: float,
+        end_time: float,
+        cycle_id: int,
+        context: str,
     ) -> model.Trial:
         """Segments the trial data based on the start and end times.
 
@@ -145,11 +145,11 @@ class GaitEventsSegmentation(_BaseSegmentation):
 
     @staticmethod
     def _segment_events(
-            context: str,
-            cycle_id: int,
-            events: pd.DataFrame | None,
-            start_time: float,
-            end_time: float,
+        context: str,
+        cycle_id: int,
+        events: pd.DataFrame | None,
+        start_time: float,
+        end_time: float,
     ) -> pd.DataFrame:
         """Segments the events based on the start and end times.
 
@@ -168,7 +168,7 @@ class GaitEventsSegmentation(_BaseSegmentation):
         new_events = events[
             (events[io.EventInputFileReader.COLUMN_TIME] >= start_time)
             & (events[io.EventInputFileReader.COLUMN_TIME] <= end_time)
-            ]
+        ]
         new_events.loc[:, "time"] -= start_time
         new_events.attrs = {
             "end_time": end_time,
@@ -181,7 +181,7 @@ class GaitEventsSegmentation(_BaseSegmentation):
 
     @staticmethod
     def _update_attrs(
-            segment: xr.DataArray, start_time, end_time, cycle_id: int, context: str
+        segment: xr.DataArray, start_time, end_time, cycle_id: int, context: str
     ):
         """Updates the attributes of the segment based on the data.
 

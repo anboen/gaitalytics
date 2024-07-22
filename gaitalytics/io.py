@@ -34,7 +34,6 @@ class _BaseFileHandler:
 
 
 class _EventFileWriter(_BaseFileHandler):
-
     @abstractmethod
     def write_events(self, events: pd.DataFrame, file_path: Path | None = None):
         """Write the events to the output file.
@@ -80,15 +79,9 @@ class C3dEventFileWriter(_EventFileWriter):
                 label_label += f"_{i + 1}"
                 time_label += f"_{i + 1}"
             subset_events = events.iloc[start:end]
-            c3d.add_parameter("EVENT",
-                              context_label,
-                              subset_events["context"].tolist())
-            c3d.add_parameter("EVENT",
-                              icon_label,
-                              subset_events["icon_id"].tolist())
-            c3d.add_parameter("EVENT",
-                              label_label,
-                              subset_events["label"].tolist())
+            c3d.add_parameter("EVENT", context_label, subset_events["context"].tolist())
+            c3d.add_parameter("EVENT", icon_label, subset_events["icon_id"].tolist())
+            c3d.add_parameter("EVENT", label_label, subset_events["label"].tolist())
 
             times = [[time // 60, time % 60] for time in subset_events["time"].tolist()]
             c3d.add_parameter("EVENT", time_label, times)
@@ -253,8 +246,7 @@ class _PyomecaInputFileReader(_BaseFileHandler):
     """
 
     def __init__(
-            self, file_path: Path,
-            pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
+        self, file_path: Path, pyomeca_class: type[pyomeca.Markers | pyomeca.Analogs]
     ):
         """Initializes a new instance of the MarkersInputFileReader class.
 
@@ -269,7 +261,7 @@ class _PyomecaInputFileReader(_BaseFileHandler):
         """
         file_ext = file_path.suffix
         if file_ext == ".c3d" and (
-                pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
+            pyomeca_class == pyomeca.Analogs or pyomeca_class == pyomeca.Markers
         ):
             data = pyomeca_class.from_c3d(file_path)
         elif file_ext == ".trc" and pyomeca_class == pyomeca.Markers:
@@ -295,7 +287,7 @@ class _PyomecaInputFileReader(_BaseFileHandler):
 
     @staticmethod
     def _to_absolute_time(
-            data: xr.DataArray, first_frame: int, rate: float
+        data: xr.DataArray, first_frame: int, rate: float
     ) -> xr.DataArray:
         """Converts the time to absolute time.
 

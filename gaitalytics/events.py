@@ -312,8 +312,8 @@ class MarkerEventDetection(_BaseEventDetection):
     ) -> np.ndarray:
         """Detects the events in the trial using projected points.
         Args:
-            sacrum_proj: The projected sacrum point.
-            point_proj: The projected point to detect the events for.
+            sacrum: The projected sacrum point.
+            point: The projected point to detect the events for.
             toe_off: True if the event is toe off, False otherwise.
 
         Returns:
