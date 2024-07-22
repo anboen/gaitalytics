@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 
-import netCDF4 as netcdf
+import h5netcdf as netcdf
 import pytest
 import xarray as xr
 
@@ -152,7 +152,7 @@ class TestTrial:
 
         assert output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"
 
-        with netcdf.Dataset(output_file_path_small, 'r') as f:
+        with netcdf.File(output_file_path_small, 'r') as f:
             rec_value = len(f.groups.keys())
             exp_value = 4
             assert rec_value == exp_value, f"Expected {exp_value} datasets, got {rec_value}"
@@ -174,7 +174,7 @@ class TestTrial:
 
         assert output_file_path_big.exists(), f"Expected {output_file_path_big} to exist, but it does not"
 
-        with netcdf.Dataset(output_file_path_big, 'r') as f:
+        with netcdf.File(output_file_path_big, 'r') as f:
             rec_value = len(f.groups.keys())
             exp_value = 4
             assert rec_value == exp_value, f"Expected {exp_value} datasets, got {rec_value}"
@@ -214,7 +214,7 @@ class TestSegmentedTrial:
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
         trial: xr.DataArray = segments.get_cycle("Left", 0).get_data(
             DataCategory.MARKERS)
-        trial.to_netcdf(output_file_path_small, group="Left/0/markers")
+        trial.to_netcdf(output_file_path_small, group="Left/0/markers", engine="h5netcdf")
 
         assert output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"
 

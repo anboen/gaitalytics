@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from pathlib import Path
 
-import netCDF4 as netcdf
+import h5netcdf as netcdf
 import pandas as pd
 import xarray as xr
 
@@ -72,7 +72,7 @@ class BaseTrial(ABC):
                 file_path.parent.mkdir(parents=True, exist_ok=True)
             else:
                 file_path.mkdir(parents=True, exist_ok=True)
-            xr.save_mfdataset(data, paths, groups=groups, mode="a")
+            xr.save_mfdataset(data, paths, groups=groups, mode="a", engine="h5netcdf")
         else:
             raise ValueError("No data to save.")
 
@@ -363,7 +363,7 @@ def _load_segmented_trial_file(file_path: Path) -> TrialCycles:
     trial_cycles = TrialCycles()
 
     for file in file_path.glob("**/*.h5"):
-        with netcdf.Dataset(str(file), "r") as f:
+        with netcdf.File(str(file), "r") as f:
             cycle_id = file.name.replace(".h5", "")
             for context in f.groups.keys():
                 trial = _load_trial(f[context], file)
@@ -389,13 +389,13 @@ def _load_trial_file(file_path: Path) -> Trial:
     Args:
         file_path: The path to the HDF5 file.
     """
-    with netcdf.Dataset(file_path, "r") as f:
+    with netcdf.File(file_path, "r") as f:
         trial = _load_trial(f, file_path)
 
     return trial
 
 
-def _load_trial(group: netcdf.Dataset, file_path: Path) -> Trial:
+def _load_trial(group: netcdf.File, file_path: Path) -> Trial:
     """Loads a trial from an HDF5 group.
 
     following structure is expected:
@@ -421,13 +421,14 @@ def _load_trial(group: netcdf.Dataset, file_path: Path) -> Trial:
     for category in DataCategory:
         if category.value in group.groups.keys():
             with xr.load_dataarray(
-                file_path, group=f"{group.name}/{category.value}"
+                    file_path, group=f"{group.name}/{category.value}"
             ) as data:
                 trial.add_data(category, data)
 
             correct_file_format = True
     if "events" in group.groups.keys():
-        with xr.load_dataset(file_path, group=f"{group.name}/events") as events:
+        with xr.load_dataset(file_path, group=f"{group.name}/events",
+                             engine="h5netcdf") as events:
             trial.events = events.to_dataframe()
         correct_file_format = True
 
