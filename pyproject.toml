@@ -7,8 +7,8 @@ name = "gaitalytics"
 dynamic = ["version"]
 description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
-requires-python = ">= 3.11"
-dependencies = ["netcdf4"]
+requires-python = ">= 3.12"
+dependencies = []
 
 [tool.setuptools_scm]
 
@@ -24,6 +24,7 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tool.pixi.pypi-dependencies]
 gaitalytics = { path = ".", editable = true }
+netcdf4 = ">=1.5.7,<1.8"
 
 [tool.pixi.dependencies]
 pyomeca = ">=2021.0.1,<2021.1"
@@ -37,10 +38,10 @@ pixi-pycharm = ">=0.0.6,<0.1"
 
 # Environments
 [tool.pixi.environments]
-default = {features = ["test", "dev", "py311"], solve-group = "default" }
-build = { features = ["build", "py311"], solve-group = "default" }
-docs = { features = ["docs", "py311"], solve-group = "default" }
-py310 = { features = ["py311", "test"], solve-group = "default" }
+default = {features = ["test", "dev", "py312"], solve-group = "default" }
+build = { features = ["build", "py312"], solve-group = "default" }
+docs = { features = ["docs", "py312"], solve-group = "default" }
+py312 = { features = ["py312", "test"], solve-group = "default" }
 
 [tool.pixi.feature.py310.dependencies]
 python = ">=3.10,<3.11"
@@ -49,7 +50,7 @@ python = ">=3.10,<3.11"
 python = ">=3.11,<3.12"
 
 [tool.pixi.feature.py312.dependencies]
-python = ">=3.11,<3.12"
+python = ">=3.12,<3.13"
 
 [tool.pixi.feature.docs.tasks]
 clean-docs = "cleanpy --include-builds --exclude .pixi ."
@@ -78,7 +79,7 @@ select = [
 pydocstyle = "google"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 ignore_missing_imports = "True"
 
 
