@@ -2506,14 +2506,14 @@ packages:
 - kind: pypi
   name: charset-normalizer
   version: 3.3.2
-  url: https://files.pythonhosted.org/packages/40/26/f35951c45070edc957ba40a5b1db3cf60a9dbb1b350c2d5bef03e01e61de/charset_normalizer-3.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: 753f10e867343b4511128c6ed8c82f7bec3bd026875576dfd88483c5c73b2fd8
+  url: https://files.pythonhosted.org/packages/3e/33/21a875a61057165e92227466e54ee076b73af1e21fe1b31f1e292251aa1e/charset_normalizer-3.3.2-cp311-cp311-macosx_10_9_x86_64.whl
+  sha256: 573f6eac48f4769d667c4442081b1794f52919e7edada77495aaed9236d13a96
   requires_python: '>=3.7.0'
 - kind: pypi
   name: charset-normalizer
   version: 3.3.2
-  url: https://files.pythonhosted.org/packages/3e/33/21a875a61057165e92227466e54ee076b73af1e21fe1b31f1e292251aa1e/charset_normalizer-3.3.2-cp311-cp311-macosx_10_9_x86_64.whl
-  sha256: 573f6eac48f4769d667c4442081b1794f52919e7edada77495aaed9236d13a96
+  url: https://files.pythonhosted.org/packages/40/26/f35951c45070edc957ba40a5b1db3cf60a9dbb1b350c2d5bef03e01e61de/charset_normalizer-3.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: 753f10e867343b4511128c6ed8c82f7bec3bd026875576dfd88483c5c73b2fd8
   requires_python: '>=3.7.0'
 - kind: pypi
   name: charset-normalizer
@@ -2619,16 +2619,16 @@ packages:
 - kind: pypi
   name: coverage
   version: 7.6.0
-  url: https://files.pythonhosted.org/packages/54/bb/9f2d3303441e87d27221fc9de4de63994a9570c899726a4f10ac16f79824/coverage-7.6.0-cp311-cp311-win_amd64.whl
-  sha256: 6379688fb4cfa921ae349c76eb1a9ab26b65f32b03d46bb0eed841fd4cb6afb1
+  url: https://files.pythonhosted.org/packages/1b/03/a5140e4f336f0b71023435d7e1564da8e2ff5552e91dfd3ec26424b72c47/coverage-7.6.0-cp311-cp311-macosx_10_9_x86_64.whl
+  sha256: c7b525ab52ce18c57ae232ba6f7010297a87ced82a2383b1afd238849c1ff933
   requires_dist:
   - tomli ; python_full_version <= '3.11.0a6' and extra == 'toml'
   requires_python: '>=3.8'
 - kind: pypi
   name: coverage
   version: 7.6.0
-  url: https://files.pythonhosted.org/packages/a2/d3/1f839af6d6cbaee2c50a0bf2d51964b56272e8b94a6504b6ab7c7ecd66c9/coverage-7.6.0-cp311-cp311-macosx_11_0_arm64.whl
-  sha256: 4bea27c4269234e06f621f3fac3925f56ff34bc14521484b8f66a580aacc2e7d
+  url: https://files.pythonhosted.org/packages/54/bb/9f2d3303441e87d27221fc9de4de63994a9570c899726a4f10ac16f79824/coverage-7.6.0-cp311-cp311-win_amd64.whl
+  sha256: 6379688fb4cfa921ae349c76eb1a9ab26b65f32b03d46bb0eed841fd4cb6afb1
   requires_dist:
   - tomli ; python_full_version <= '3.11.0a6' and extra == 'toml'
   requires_python: '>=3.8'
@@ -2643,8 +2643,8 @@ packages:
 - kind: pypi
   name: coverage
   version: 7.6.0
-  url: https://files.pythonhosted.org/packages/1b/03/a5140e4f336f0b71023435d7e1564da8e2ff5552e91dfd3ec26424b72c47/coverage-7.6.0-cp311-cp311-macosx_10_9_x86_64.whl
-  sha256: c7b525ab52ce18c57ae232ba6f7010297a87ced82a2383b1afd238849c1ff933
+  url: https://files.pythonhosted.org/packages/a2/d3/1f839af6d6cbaee2c50a0bf2d51964b56272e8b94a6504b6ab7c7ecd66c9/coverage-7.6.0-cp311-cp311-macosx_11_0_arm64.whl
+  sha256: 4bea27c4269234e06f621f3fac3925f56ff34bc14521484b8f66a580aacc2e7d
   requires_dist:
   - tomli ; python_full_version <= '3.11.0a6' and extra == 'toml'
   requires_python: '>=3.8'
@@ -2952,9 +2952,9 @@ packages:
   timestamp: 1694616398888
 - kind: pypi
   name: gaitalytics
-  version: 0.1.dev41+g6dbe645.d20240722
+  version: 0.1.dev42+ge2b5619
   path: .
-  sha256: a9b28c4088f6721b0bfc3731fa4f444e308c442cac6e091de598aebf8effa096
+  sha256: c299393c8dc5389039101cb5f382e6cb09f9b6ab44ecbac677c8424b423b9af6
   requires_dist:
   - netcdf4
   - twine ; extra == 'build'
@@ -6017,12 +6017,6 @@ packages:
 - kind: pypi
   name: markupsafe
   version: 2.1.5
-  url: https://files.pythonhosted.org/packages/97/18/c30da5e7a0e7f4603abfc6780574131221d9148f323752c2755d48abad30/MarkupSafe-2.1.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: b91c037585eba9095565a3556f611e3cbfaa42ca1e865f7b8015fe5c7336d5a5
-  requires_python: '>=3.7'
-- kind: pypi
-  name: markupsafe
-  version: 2.1.5
   url: https://files.pythonhosted.org/packages/11/e7/291e55127bb2ae67c64d66cef01432b5933859dfb7d6949daa721b89d0b3/MarkupSafe-2.1.5-cp311-cp311-macosx_10_9_universal2.whl
   sha256: 629ddd2ca402ae6dbedfceeba9c46d5f7b2a61d9749597d4307f943ef198fc1f
   requires_python: '>=3.7'
@@ -6037,6 +6031,12 @@ packages:
   version: 2.1.5
   url: https://files.pythonhosted.org/packages/b7/a2/c78a06a9ec6d04b3445a949615c4c7ed86a0b2eb68e44e7541b9d57067cc/MarkupSafe-2.1.5-cp311-cp311-win_amd64.whl
   sha256: 2b7c57a4dfc4f16f7142221afe5ba4e093e09e728ca65c51f5620c9aaeb9a617
+  requires_python: '>=3.7'
+- kind: pypi
+  name: markupsafe
+  version: 2.1.5
+  url: https://files.pythonhosted.org/packages/97/18/c30da5e7a0e7f4603abfc6780574131221d9148f323752c2755d48abad30/MarkupSafe-2.1.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: b91c037585eba9095565a3556f611e3cbfaa42ca1e865f7b8015fe5c7336d5a5
   requires_python: '>=3.7'
 - kind: conda
   name: matplotlib-base
@@ -6230,8 +6230,8 @@ packages:
 - kind: pypi
   name: mypy
   version: 1.11.0
-  url: https://files.pythonhosted.org/packages/4b/56/a1ac65714ee33a35d9f1b6173b8c989c05120cb386dbbe6709ba4cc7a9e4/mypy-1.11.0-cp311-cp311-win_amd64.whl
-  sha256: d8e2e43977f0e09f149ea69fd0556623919f816764e26d74da0c8a7b48f3e18a
+  url: https://files.pythonhosted.org/packages/46/69/728aca603433e52b7d2d659678f47562fead09106686a28967d978ef50b8/mypy-1.11.0-cp311-cp311-macosx_10_9_x86_64.whl
+  sha256: 98790025861cb2c3db8c2f5ad10fc8c336ed2a55f4daf1b8b3f877826b6ff2eb
   requires_dist:
   - typing-extensions>=4.6.0
   - mypy-extensions>=1.0.0
@@ -6244,8 +6244,8 @@ packages:
 - kind: pypi
   name: mypy
   version: 1.11.0
-  url: https://files.pythonhosted.org/packages/9a/fd/ba4064c7c0e3c650ef496bf6f41785eaa9091532f0ddffe47186ae24db08/mypy-1.11.0-cp311-cp311-macosx_11_0_arm64.whl
-  sha256: 25bcfa75b9b5a5f8d67147a54ea97ed63a653995a82798221cca2a315c0238c1
+  url: https://files.pythonhosted.org/packages/4b/56/a1ac65714ee33a35d9f1b6173b8c989c05120cb386dbbe6709ba4cc7a9e4/mypy-1.11.0-cp311-cp311-win_amd64.whl
+  sha256: d8e2e43977f0e09f149ea69fd0556623919f816764e26d74da0c8a7b48f3e18a
   requires_dist:
   - typing-extensions>=4.6.0
   - mypy-extensions>=1.0.0
@@ -6272,8 +6272,8 @@ packages:
 - kind: pypi
   name: mypy
   version: 1.11.0
-  url: https://files.pythonhosted.org/packages/46/69/728aca603433e52b7d2d659678f47562fead09106686a28967d978ef50b8/mypy-1.11.0-cp311-cp311-macosx_10_9_x86_64.whl
-  sha256: 98790025861cb2c3db8c2f5ad10fc8c336ed2a55f4daf1b8b3f877826b6ff2eb
+  url: https://files.pythonhosted.org/packages/9a/fd/ba4064c7c0e3c650ef496bf6f41785eaa9091532f0ddffe47186ae24db08/mypy-1.11.0-cp311-cp311-macosx_11_0_arm64.whl
+  sha256: 25bcfa75b9b5a5f8d67147a54ea97ed63a653995a82798221cca2a315c0238c1
   requires_dist:
   - typing-extensions>=4.6.0
   - mypy-extensions>=1.0.0
@@ -6442,13 +6442,13 @@ packages:
 - kind: pypi
   name: nh3
   version: 0.2.18
-  url: https://files.pythonhosted.org/packages/1b/63/6ab90d0e5225ab9780f6c9fb52254fa36b52bb7c188df9201d05b647e5e1/nh3-0.2.18-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  sha256: de3ceed6e661954871d6cd78b410213bdcb136f79aafe22aa7182e028b8c7307
+  url: https://files.pythonhosted.org/packages/b3/89/1daff5d9ba5a95a157c092c7c5f39b8dd2b1ddb4559966f808d31cfb67e0/nh3-0.2.18-cp37-abi3-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl
+  sha256: 14c5a72e9fe82aea5fe3072116ad4661af5cf8e8ff8fc5ad3450f123e4925e86
 - kind: pypi
   name: nh3
   version: 0.2.18
-  url: https://files.pythonhosted.org/packages/b3/89/1daff5d9ba5a95a157c092c7c5f39b8dd2b1ddb4559966f808d31cfb67e0/nh3-0.2.18-cp37-abi3-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl
-  sha256: 14c5a72e9fe82aea5fe3072116ad4661af5cf8e8ff8fc5ad3450f123e4925e86
+  url: https://files.pythonhosted.org/packages/1b/63/6ab90d0e5225ab9780f6c9fb52254fa36b52bb7c188df9201d05b647e5e1/nh3-0.2.18-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: de3ceed6e661954871d6cd78b410213bdcb136f79aafe22aa7182e028b8c7307
 - kind: conda
   name: numpy
   version: 2.0.0
@@ -7721,14 +7721,14 @@ packages:
 - kind: pypi
   name: ruff
   version: 0.5.4
-  url: https://files.pythonhosted.org/packages/82/35/d6c3c83fb8817328db73c15b1836ccb0c3ce56b72d0d01d98b3a452bec58/ruff-0.5.4-py3-none-win_amd64.whl
-  sha256: 58b54459221fd3f661a7329f177f091eb35cf7a603f01d9eb3eb11cc348d38c4
+  url: https://files.pythonhosted.org/packages/11/23/ffe51028ba274223191d3f96b059108cf7690eb93985a7fdb077c3d1191b/ruff-0.5.4-py3-none-macosx_10_12_x86_64.whl
+  sha256: da62e87637c8838b325e65beee485f71eb36202ce8e3cdbc24b9fcb8b99a37be
   requires_python: '>=3.7'
 - kind: pypi
   name: ruff
   version: 0.5.4
-  url: https://files.pythonhosted.org/packages/28/75/843aa3d10a39ab60fbd63f65c825f647907a9732ac27e24d3f94dd2db618/ruff-0.5.4-py3-none-macosx_11_0_arm64.whl
-  sha256: e98ad088edfe2f3b85a925ee96da652028f093d6b9b56b76fc242d8abb8e2059
+  url: https://files.pythonhosted.org/packages/82/35/d6c3c83fb8817328db73c15b1836ccb0c3ce56b72d0d01d98b3a452bec58/ruff-0.5.4-py3-none-win_amd64.whl
+  sha256: 58b54459221fd3f661a7329f177f091eb35cf7a603f01d9eb3eb11cc348d38c4
   requires_python: '>=3.7'
 - kind: pypi
   name: ruff
@@ -7739,8 +7739,8 @@ packages:
 - kind: pypi
   name: ruff
   version: 0.5.4
-  url: https://files.pythonhosted.org/packages/11/23/ffe51028ba274223191d3f96b059108cf7690eb93985a7fdb077c3d1191b/ruff-0.5.4-py3-none-macosx_10_12_x86_64.whl
-  sha256: da62e87637c8838b325e65beee485f71eb36202ce8e3cdbc24b9fcb8b99a37be
+  url: https://files.pythonhosted.org/packages/28/75/843aa3d10a39ab60fbd63f65c825f647907a9732ac27e24d3f94dd2db618/ruff-0.5.4-py3-none-macosx_11_0_arm64.whl
+  sha256: e98ad088edfe2f3b85a925ee96da652028f093d6b9b56b76fc242d8abb8e2059
   requires_python: '>=3.7'
 - kind: conda
   name: scipy
