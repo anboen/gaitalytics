@@ -421,14 +421,15 @@ def _load_trial(group: netcdf.File, file_path: Path) -> Trial:
     for category in DataCategory:
         if category.value in group.groups.keys():
             with xr.load_dataarray(
-                    file_path, group=f"{group.name}/{category.value}"
+                file_path, group=f"{group.name}/{category.value}"
             ) as data:
                 trial.add_data(category, data)
 
             correct_file_format = True
     if "events" in group.groups.keys():
-        with xr.load_dataset(file_path, group=f"{group.name}/events",
-                             engine="h5netcdf") as events:
+        with xr.load_dataset(
+            file_path, group=f"{group.name}/events", engine="h5netcdf"
+        ) as events:
             trial.events = events.to_dataframe()
         correct_file_format = True
 

@@ -9,29 +9,26 @@ description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
 maintainers = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 keywords = ["gait-analysis", "mocap", "c3d", "gait-metrics", "biomechanics"]
 classifiers = [
-  # How mature is this project? Common values are
-  #   3 - Alpha
-  #   4 - Beta
-  #   5 - Production/Stable
-  "Development Status :: 3 - Alpha",
-
-  # Indicate who your project is intended for
-  "Intended Audience :: Researcher",
-  "Topic :: Software Development :: Build Tools",
-
-  # Pick your license as you wish (see also "license" above)
-  "License :: OSI Approved :: MIT License",
-
-  # Specify the Python versions you support here.
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12", ]
+    # How mature is this project? Common values are
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    "Development Status :: 3 - Alpha",
+    # Indicate who your project is intended for
+    "Intended Audience :: Researcher",
+    "Topic :: Software Development :: Build Tools",
+    # Pick your license as you wish (see also "license" above)
+    "License :: OSI Approved :: MIT License",
+    # Specify the Python versions you support here.
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12", ]
 requires-python = ">= 3.11"
-dependencies = []
+dependencies = ["h5netcdf>=1.3.0,<1.4", "pandas>=1.5,<2.3", "pyyaml>=6.0.1,<6.1", "scipy>=1.13,<1.15", "numpy>=1.23,<2.1", "xarray>=2024.6.0,<2024.7"]
 
 [project.urls]
 Homepage = "https://github.com/DART-Lab-LLUI/python-gaitalytics"
@@ -41,7 +38,7 @@ Issues = "https://github.com/DART-Lab-LLUI/python-gaitalytics/issues"
 #Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
-dev = ["ruff", "mypy"]
+dev = ["ruff", "mypy", "pip"]
 test = ["pytest", "pytest-cov"]
 build = ["build"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints", "sphinx_github_changelog"]
@@ -55,22 +52,16 @@ gaitalytics = { path = ".", editable = true }
 
 [tool.pixi.dependencies]
 pyomeca = ">=2021.0,<2021.1"
-pandas = ">=1.5,<2.3"
-pyyaml = ">=6.0.1,<6.1"
-scipy = ">=1.13,<1.15"
-numpy = ">=1.23,<2.1"
-ezc3d = { verion=">=1.5.10,<1.6", build = "*python*" }
-xarray = ">=2024.6.0,<2024.7"
+ezc3d = { version = ">=1.5.10,<1.6", build = "*python*" }
 pixi-pycharm = ">=0.0.6,<0.1"
-h5netcdf = ">=1.3.0,<1.4"
 
 # Environments
 [tool.pixi.environments]
-dev = {features = ["test", "dev", "py311"]}
-build = { features = ["build", "py311"]}
-docs = { features = ["docs", "py311"]}
-py311 = { features = ["py311", "test"]}
-py312 = { features = ["py312", "test"]}
+dev = { features = ["py311", "test", "dev"] }
+build = { features = ["build", "py311"] }
+docs = { features = ["docs", "py311"] }
+py311 = { features = ["py311", "test"] }
+py312 = { features = ["py312", "test"] }
 
 
 [tool.pixi.feature.py311.dependencies]
@@ -85,9 +76,12 @@ docs = "sphinx-build -M html ./docs ./docs/_build -W --keep-going"
 
 [tool.pixi.tasks]
 test = "pytest -vv --cov=gaitalytics --cov-report=term-missing --cov-config=.coveragerc --capture=sys"
+
+[tool.pixi.feature.dev.tasks]
 ruff-format = "ruff format gaitalytics"
-ruff-check = {cmd="ruff check gaitalytics --fix", depends-on=["ruff-format"]}
-check-code = {cmd="mypy gaitalytics --check-untyped-defs", depends-on=["ruff-check"]}
+ruff-check = { cmd = "ruff check gaitalytics --fix", depends-on = ["ruff-format"] }
+load-stubs = { cmd = "mypy --install-types", depends-on = ["ruff-check"] }
+check-code = { cmd = "mypy gaitalytics --check-untyped-defs", depends-on = ["load-stubs"] }
 
 [tool.pixi.feature.build.tasks]
 build = "python -m build"
