@@ -39,8 +39,8 @@ class BaseTrial(ABC):
         Args:
             file_path: The path to the HDF5 file.
             base_group: The base group to save the data.
-                If None, the data will be saved in the root of the file.
-                Default = None
+            If None, the data will be saved in the root of the file.
+            Default = None
         """
         raise NotImplementedError
 
@@ -50,13 +50,13 @@ class BaseTrial(ABC):
         Args:
             file_path: The path to the HDF5 file.
             base_group: The base group to save the data.
-                If None, the data will be saved in the root of the file.
-                Default = None
+            If None, the data will be saved in the root of the file.
+            Default = None
 
         Raises:
             FileExistsError: If the file already exists.
             ValueError: If the trial is a segmented trial and
-                the file path is a single file.
+            the file path is a single file.
             ValueError: If the trial is a trial and the file path is a folder.
         """
         if file_path.exists():
@@ -293,7 +293,20 @@ def trial_from_hdf5(file_path: Path) -> Trial | TrialCycles:
 
     Following structure is expected:
     Trial:
-        - file_path (hdf5 file)
+    - file_path (hdf5 file)
+        - Left (context)
+            - markers
+                - xarray.DataArray
+            - analogs
+                - xarray.DataArray
+            - events
+                - xarray.Dataset
+        - Right (context)
+            ...
+
+    TrialCycles:
+    - file_path (folder)
+        - 0.h5 (cycle_id)
             - Left (context)
                 - markers
                     - xarray.DataArray
@@ -303,20 +316,7 @@ def trial_from_hdf5(file_path: Path) -> Trial | TrialCycles:
                     - xarray.Dataset
             - Right (context)
                 ...
-
-    TrialCycles:
-        - file_path (folder)
-            - 0.h5 (cycle_id)
-                - Left (context)
-                    - markers
-                        - xarray.DataArray
-                    - analogs
-                        - xarray.DataArray
-                    - events
-                        - xarray.Dataset
-                - Right (context)
-                    ...
-            - ...
+        - ...
 
     Args:
         file_path: The path to the HDF5 file or folder with the expected structure.

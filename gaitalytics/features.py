@@ -91,30 +91,30 @@ class _CycleFeaturesCalculation(ABC):
                 f"Missing events in segment {curren_context} nr. {cycle_id}"
             )
         ipsi = trial_events[
-            trial_events[io.EventInputFileReader.COLUMN_CONTEXT] == curren_context
-        ]
+            trial_events[io._EventInputFileReader.COLUMN_CONTEXT] == curren_context
+            ]
         contra = trial_events[
-            trial_events[io.EventInputFileReader.COLUMN_CONTEXT] != curren_context
-        ]
+            trial_events[io._EventInputFileReader.COLUMN_CONTEXT] != curren_context
+            ]
         if len(ipsi) != 3:
             raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
         if len(contra) != 2:
             raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
 
         contra_fs = contra[
-            contra[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE
-        ]
+            contra[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE
+            ]
         contra_fo = contra[
-            contra[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF
-        ]
-        ipsi_fs = ipsi[ipsi[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE]
-        ipsi_fo = ipsi[ipsi[io.EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF]
+            contra[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF
+            ]
+        ipsi_fs = ipsi[ipsi[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE]
+        ipsi_fo = ipsi[ipsi[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF]
 
-        ipsi_fs_time_start = ipsi_fs[io.EventInputFileReader.COLUMN_TIME].values[0]
-        ipsi_fs_time_end = ipsi_fs[io.EventInputFileReader.COLUMN_TIME].values[1]
-        ipsi_fo_time = ipsi_fo[io.EventInputFileReader.COLUMN_TIME].values[0]
-        contra_fs_time = contra_fs[io.EventInputFileReader.COLUMN_TIME].values[0]
-        contra_fo_time = contra_fo[io.EventInputFileReader.COLUMN_TIME].values[0]
+        ipsi_fs_time_start = ipsi_fs[io._EventInputFileReader.COLUMN_TIME].values[0]
+        ipsi_fs_time_end = ipsi_fs[io._EventInputFileReader.COLUMN_TIME].values[1]
+        ipsi_fo_time = ipsi_fo[io._EventInputFileReader.COLUMN_TIME].values[0]
+        contra_fs_time = contra_fs[io._EventInputFileReader.COLUMN_TIME].values[0]
+        contra_fo_time = contra_fo[io._EventInputFileReader.COLUMN_TIME].values[0]
 
         return (
             ipsi_fs_time_start,
@@ -212,11 +212,11 @@ class TimeSeriesFeatures(_CycleFeaturesCalculation):
         """Calculate the time series features for a trial.
 
         Following features are calculated:
-        - min
-        - max
-        - mean
-        - median
-        - std
+            - min
+            - max
+            - mean
+            - median
+            - std
 
         Args:
             trial: The trial for which to calculate the features.
@@ -238,6 +238,18 @@ class TimeSeriesFeatures(_CycleFeaturesCalculation):
 
 
 class TemporalFeatures(_CycleFeaturesCalculation):
+    """Calculate temporal features for a trial.
+
+    This class calculates following temporal features for a trial.
+        - double_support
+        - single_support
+        - foot_off
+        - opposite_foot_off
+        - opposite_foot_contact
+        - stride_time
+        - step_time
+        - cadence
+    """
     def _calculate(self, trial: model.Trial) -> xr.DataArray:
         """Calculate the support times for a trial.
 
@@ -298,6 +310,13 @@ class TemporalFeatures(_CycleFeaturesCalculation):
 
 
 class SpatialFeatures(_PointDependentFeature):
+    """Calculate spatial features for a trial.
+
+    This class calculates following spatial features for a trial.
+    - step_length
+    - step_width
+    """
+
     def _calculate(self, trial: model.Trial) -> xr.DataArray:
         """Calculate the spatial features for a trial.
 

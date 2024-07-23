@@ -90,7 +90,7 @@ class C3dEventFileWriter(_EventFileWriter):
         c3d.write(str(path))
 
 
-class EventInputFileReader(_BaseFileHandler):
+class _EventInputFileReader(_BaseFileHandler):
     """Abstract base class for reading event input files.
 
     This class defines the interface for reading event input files
@@ -115,7 +115,7 @@ class EventInputFileReader(_BaseFileHandler):
         raise NotImplementedError
 
 
-class C3dEventInputFileReader(EventInputFileReader):
+class C3dEventInputFileReader(_EventInputFileReader):
     """A class for handling C3D files in an easy and convenient way.
 
     Implements the EventInputFileReader interface to read events from C3D files.

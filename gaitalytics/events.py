@@ -45,9 +45,9 @@ class SequenceEventChecker(_BaseEventChecker):
     It checks the sequence of event labels and contexts.
     """
 
-    _TIME_COLUMN = io.EventInputFileReader.COLUMN_TIME
-    _LABEL_COLUMN = io.EventInputFileReader.COLUMN_LABEL
-    _CONTEXT_COLUMN = io.EventInputFileReader.COLUMN_CONTEXT
+    _TIME_COLUMN = io._EventInputFileReader.COLUMN_TIME
+    _LABEL_COLUMN = io._EventInputFileReader.COLUMN_LABEL
+    _CONTEXT_COLUMN = io._EventInputFileReader.COLUMN_CONTEXT
 
     def check_events(self, events: pd.DataFrame) -> tuple[bool, list | None]:
         """Checks the sequence of events in the trial.
@@ -64,7 +64,7 @@ class SequenceEventChecker(_BaseEventChecker):
         Returns:
             bool: True if the sequence is correct, False otherwise.
             list | None: A list time slice of incorrect sequence,
-                or None if the sequence is correct.
+            or None if the sequence is correct.
 
         """
         if events is None:
@@ -178,10 +178,10 @@ class MarkerEventDetection(_BaseEventDetection):
     The algorithm is based on the paper by Zeni et al. (2008).
     """
 
-    _TIME_COLUMN = io.EventInputFileReader.COLUMN_TIME
-    _LABEL_COLUMN = io.EventInputFileReader.COLUMN_LABEL
-    _CONTEXT_COLUMN = io.EventInputFileReader.COLUMN_CONTEXT
-    _ICON_COLUMN = io.EventInputFileReader.COLUMN_ICON
+    _TIME_COLUMN = io._EventInputFileReader.COLUMN_TIME
+    _LABEL_COLUMN = io._EventInputFileReader.COLUMN_LABEL
+    _CONTEXT_COLUMN = io._EventInputFileReader.COLUMN_CONTEXT
+    _ICON_COLUMN = io._EventInputFileReader.COLUMN_ICON
 
     def detect_events(self, trial: model.Trial) -> pd.DataFrame:
         """Detects the events in the trial using marker data.

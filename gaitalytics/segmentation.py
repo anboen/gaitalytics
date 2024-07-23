@@ -87,14 +87,14 @@ class GaitEventsSegmentation(_BaseSegmentation):
         """
         splits = {}
         interesting_events = events[
-            events[io.EventInputFileReader.COLUMN_LABEL] == self.event_label
-        ]
-        contexts = events[io.EventInputFileReader.COLUMN_CONTEXT].unique()
+            events[io._EventInputFileReader.COLUMN_LABEL] == self.event_label
+            ]
+        contexts = events[io._EventInputFileReader.COLUMN_CONTEXT].unique()
         for context in contexts:
             context_events = interesting_events[
-                interesting_events[io.EventInputFileReader.COLUMN_CONTEXT] == context
-            ]
-            splits[context] = context_events[io.EventInputFileReader.COLUMN_TIME].values
+                interesting_events[io._EventInputFileReader.COLUMN_CONTEXT] == context
+                ]
+            splits[context] = context_events[io._EventInputFileReader.COLUMN_TIME].values
         return splits
 
     def _get_segment(
@@ -166,8 +166,8 @@ class GaitEventsSegmentation(_BaseSegmentation):
         if events is None:
             raise ValueError("Events are not set.")
         new_events = events[
-            (events[io.EventInputFileReader.COLUMN_TIME] >= start_time)
-            & (events[io.EventInputFileReader.COLUMN_TIME] <= end_time)
+            (events[io._EventInputFileReader.COLUMN_TIME] >= start_time)
+            & (events[io._EventInputFileReader.COLUMN_TIME] <= end_time)
         ]
         new_events.loc[:, "time"] -= start_time
         new_events.attrs = {

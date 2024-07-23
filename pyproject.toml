@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
 maintainers = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
-readme = "README.md"
+readme = "README.rst"
 license = { file = "LICENSE" }
 keywords = ["gait-analysis", "mocap", "c3d", "gait-metrics", "biomechanics"]
 classifiers = [
