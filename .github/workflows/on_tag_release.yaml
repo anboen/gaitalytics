@@ -26,11 +26,11 @@ jobs:
       - name: Setup pixi
         uses: prefix-dev/setup-pixi@v0.8.1
         with:
-          pixi-version: v0.25.0
+          pixi-version: v0.26.1
           cache: false
-      - run: pixi run build
+      - run: pixi run sdist
       - run: ls -l dist
-      - run: echo ${{github.event.release.tag_name}}
+      - run: echo ${{github.ref}}
       #- name: Upload Release Asset
       #  id: upload-release-asset
       #  uses: actions/upload-release-asset@v1
