@@ -1,12 +1,12 @@
-name: Code Tests
-run-name: ${{ github.actor }} is testing the code
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
       - 'test*
   #schedule:
    # - cron: '0 14 * * 5'
+
+name: Code Tests
+run-name: ${{ github.actor }} is testing the code
 jobs:
   Windows-Tests:
     runs-on: windows-latest
