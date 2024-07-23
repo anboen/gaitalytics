@@ -3,13 +3,18 @@ on:
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-permissions: write-all
+
 name: Create Release
 
 jobs:
   build:
     name: Create Release
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+      deployments: write
     steps:
       - name: Checkout code
         uses: actions/checkout@master
@@ -21,5 +26,9 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
           draft: false
           prerelease: false
