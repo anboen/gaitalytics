@@ -93,14 +93,13 @@ Analysis
 | moments         | - mean                                                     |                                       |
 | power           | - sd                                                       |                                       |
 +-----------------+------------------------------------------------------------+---------------------------------------+
-| Spatio-temporal | - step_length                                              |                                       |
-|                 | - stride_length                                            |                                       |
+| Spatio-temporal | - step_length [1]                                          |                                       |
+|                 | - stride_length [1]                                        |                                       |
 |                 | - cycle_duration                                           |                                       |
 |                 | - swing_duration_perc                                      |                                       |
 |                 | - stance_duration_perc                                     |                                       |
-|                 | - step_height                                              |                                       |
-|                 | - step_width                                               |                                       |
-|                 | - cadence                                                  |                                       |
+|                 | - step_width [1]                                           |                                       |
+|                 | - cadence [1]                                              |                                       |
 |                 | - single_support_duration_percent [2]                      |                                       |
 |                 | - double_support_duration_percent [2]                      |                                       |
 +-----------------+------------------------------------------------------------+---------------------------------------+
@@ -108,10 +107,9 @@ Analysis
 References
 """"""""""
 
-[1] Michael D. Lewek et al. (2012), “The influence of mechanically and
-physiologically imposed stiff-knee gait patterns on the energy cost of
-walking”, vol. 93, no.1, pp. 123-128. Publisher: Archives of Physical
-Medicine and Rehabilitation.
+[1] J. H. Hollman, E. M. McDade, and R. C. Petersen, “Normative Spatiotemporal
+Gait Parameters in Older Adults,” Gait Posture, vol. 34, no. 1, pp. 111–118,
+May 2011, doi: 10.1016/j.gaitpost.2011.03.024.
 
 [2] A. Gouelle and F. Mégrot (2017), “Interpreting spatiotemporal
 parameters, symmetry, and variability in clinical gait analysis”,
