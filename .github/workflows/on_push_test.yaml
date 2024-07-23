@@ -1,6 +1,10 @@
 name: Code Tests
 run-name: ${{ github.actor }} is testing the code
-on: [push]
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'test*
   #schedule:
    # - cron: '0 14 * * 5'
 jobs:
