@@ -1,0 +1,15 @@
+exclude *
+
+include README.rst
+include CHANGELOG.rst
+include AUTHORS.rst
+include LICENSE
+
+include pyproject.toml
+recursive-include gaitalytics *.py
+
+
+prune docs/_build
+prune build
+prune tests
+prune docs

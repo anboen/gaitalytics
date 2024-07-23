@@ -85,6 +85,8 @@ check-code = { cmd = "mypy gaitalytics --check-untyped-defs", depends-on = ["loa
 
 [tool.pixi.feature.build.tasks]
 build = "python -m build"
+sdist = "python -m build --sdist"
+wheel = "python -m build --wheel"
 
 [tool.setuptools]
 packages = ["gaitalytics", "gaitalytics.utils"]
