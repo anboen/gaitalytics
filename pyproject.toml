@@ -87,7 +87,7 @@ check-code = { cmd = "mypy gaitalytics --check-untyped-defs", depends-on = ["loa
 build = "python -m build"
 
 [tool.setuptools]
-packages = ["gaitalytics"]
+packages = ["gaitalytics", "gaitalytics.utils"]
 
 [tool.setuptools_scm]
 
