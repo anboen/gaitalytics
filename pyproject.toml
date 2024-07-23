@@ -7,8 +7,38 @@ name = "gaitalytics"
 dynamic = ["version"]
 description = "easy gait-metrics for everyone"
 authors = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
+maintainers = [{ name = "André Böni", email = "andre.boeni@llui.org" }]
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["gait-analysis", "mocap", "c3d", "gait-metrics", "biomechanics"]
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 3 - Alpha",
+
+  # Indicate who your project is intended for
+  "Intended Audience :: Researcher",
+  "Topic :: Software Development :: Build Tools",
+
+  # Pick your license as you wish (see also "license" above)
+  "License :: OSI Approved :: MIT License",
+
+  # Specify the Python versions you support here.
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12", ]
 requires-python = ">= 3.11"
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/DART-Lab-LLUI/python-gaitalytics"
+Documentation = "https://readthedocs.org"
+Repository = "https://python-gaitalytics.readthedocs.io"
+Issues = "https://github.com/DART-Lab-LLUI/python-gaitalytics/issues"
+#Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = ["ruff", "mypy"]
