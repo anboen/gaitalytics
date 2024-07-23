@@ -10,11 +10,7 @@ jobs:
   build:
     name: Create Release
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
-      deployments: write
-      attestations: write
+    permissions: write-all
     steps:
       - name: Checkout code
         uses: actions/checkout@master
