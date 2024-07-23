@@ -31,14 +31,14 @@ jobs:
           cache: false
       - run: pixi run sdist
       - run: ls -l dist
-      - run: echo "${{ github.ref }}" | sed 's|/refs/tags/v||'
-      #- name: Upload Release Asset
-      #  id: upload-release-asset
-      #  uses: actions/upload-release-asset@v1
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #  with:
-      #    upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #    asset_name: sdist.tar.gz
-      #    asset_path: ./dist/*.tar.gz
-      #    asset_content_type: application/zip
+      - run: echo "$version"
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_name: gaitalytics-${{env.version}}.tar.gz
+          asset_path: ./dist/gaitalytics-${{env.version}}.tar.gz
+          asset_content_type: application/zip
