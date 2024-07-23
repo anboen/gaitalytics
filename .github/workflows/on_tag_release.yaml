@@ -32,5 +32,5 @@ jobs:
       - name: Upload Asset
         uses: actions/upload-artifact@v4
         with:
-          path: ./dist/*${{ github.ref }}*.tar.gz
+          path: ./dist/*.tar.gz
           if-no-files-found: error
