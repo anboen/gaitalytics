@@ -35,8 +35,11 @@ class _PathConverter:
             if param.annotation == Path | str or param.annotation == Path | str | None:
                 if isinstance(value, (Path, str)):
                     value = Path(value)
-            if param.kind in [param.VAR_POSITIONAL, param.POSITIONAL_ONLY,
-                              param.POSITIONAL_OR_KEYWORD]:
+            if param.kind in [
+                param.VAR_POSITIONAL,
+                param.POSITIONAL_ONLY,
+                param.POSITIONAL_OR_KEYWORD,
+            ]:
                 new_args.append(value)
             else:
                 bound_arguments.arguments[name] = value
@@ -58,9 +61,10 @@ def load_config(config_path: Path | str) -> mapping.MappingConfigs:
 
 
 @_PathConverter
-def load_c3d_trial(c3d_file: Path | str,
-                   configs: mapping.MappingConfigs) -> model.Trial:
-    """ Loads a Trial from a c3d file.
+def load_c3d_trial(
+    c3d_file: Path | str, configs: mapping.MappingConfigs
+) -> model.Trial:
+    """Loads a Trial from a c3d file.
 
     Be aware that all the required data for the trial must be present in the c3d file.
     i.e. markers, analogs, events, etc.
@@ -86,10 +90,9 @@ def load_c3d_trial(c3d_file: Path | str,
     return trial
 
 
-def detect_events(trial: model.Trial,
-                  config: mapping.MappingConfigs,
-                  method: str = "Marker",
-                  **kwargs) -> pd.DataFrame:
+def detect_events(
+    trial: model.Trial, config: mapping.MappingConfigs, method: str = "Marker", **kwargs
+) -> pd.DataFrame:
     """Detects the events in the trial.
 
     Args:
@@ -114,8 +117,7 @@ def detect_events(trial: model.Trial,
     return event_table
 
 
-def check_events(event_table: pd.DataFrame,
-                 method: str = "sequence"):
+def check_events(event_table: pd.DataFrame, method: str = "sequence"):
     """Checks the events in the trial.
 
     Args:
@@ -138,8 +140,11 @@ def check_events(event_table: pd.DataFrame,
 
 
 @_PathConverter
-def write_events_to_c3d(c3d_path: Path | str, event_table: pd.DataFrame,
-                        output_path: Path | str = None):
+def write_events_to_c3d(
+    c3d_path: Path | str,
+    event_table: pd.DataFrame,
+    output_path: Path | str | None = None,
+):
     """Writes the events to the c3d file.
 
     Args:
@@ -151,8 +156,7 @@ def write_events_to_c3d(c3d_path: Path | str, event_table: pd.DataFrame,
     io.C3dEventFileWriter(c3d_path).write_events(event_table, output_path)
 
 
-def segment_trial(trial: model.Trial,
-                  method: str = "HS") -> model.TrialCycles:
+def segment_trial(trial: model.Trial, method: str = "HS") -> model.TrialCycles:
     """Segments the trial into cycles
 
     Args:
@@ -170,13 +174,13 @@ def segment_trial(trial: model.Trial,
         case _:
             raise ValueError(f"Unsupported method: {method}")
 
-    trial = method_obj.segment(trial)
-    return trial
+    trial_cycles = method_obj.segment(trial)
+    return trial_cycles
 
 
-def time_normalise_trial(trial: model.Trial | model.TrialCycles,
-                         method: str = "linear",
-                         **kwargs) -> model.Trial | model.TrialCycles:
+def time_normalise_trial(
+    trial: model.Trial | model.TrialCycles, method: str = "linear", **kwargs
+) -> model.Trial | model.TrialCycles:
     """Normalises the time in the trial.
 
     Args:
