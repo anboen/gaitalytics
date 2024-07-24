@@ -13,3 +13,4 @@ prune docs/_build
 prune build
 prune tests
 prune docs
+prune conda.recipe

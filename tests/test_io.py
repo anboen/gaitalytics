@@ -20,7 +20,6 @@ INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
 INPUT_C3D_BIG_NO_EVENTS: Path = Path('tests/data/test_big_no_events.c3d')
 
 
-
 @pytest.fixture()
 def out_path(request):
     input_file = INPUT_C3D_BIG_NO_EVENTS
@@ -46,10 +45,12 @@ class TestWriteEvents:
 
         rec_events = C3dEventInputFileReader(out_path).get_events()
 
-        assert len(rec_events) == len(events) , f"Expected {len(events)} events, got {len(rec_events)}"
+        assert len(rec_events) == len(
+            events), f"Expected {len(events)} events, got {len(rec_events)}"
         for i in range(len(events)):
             assert rec_events['time'].iloc[i] == pytest.approx(
-                events['time'].iloc[i]), f"Expected {events['time'].iloc[i]}, got {rec_events['time'].iloc[i]}"
+                events['time'].iloc[
+                    i]), f"Expected {events['time'].iloc[i]}, got {rec_events['time'].iloc[i]}"
             assert rec_events['label'].iloc[i] == events['label'].iloc[
                 i], f"Expected {events['label'].iloc[i]}, got {rec_events['label'].iloc[i]}"
             assert rec_events['context'].iloc[i] == events['context'].iloc[

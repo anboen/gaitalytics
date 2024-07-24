@@ -128,7 +128,7 @@ class SequenceEventChecker(_BaseEventChecker):
         # Check the occurrence of the context in windows of 3 events.
         for i in range(len(events) - 3):
             max_occurance = (
-                events[self._CONTEXT_COLUMN].iloc[i : i + 3].value_counts().max()
+                events[self._CONTEXT_COLUMN].iloc[i: i + 3].value_counts().max()
             )
 
             # If the context occurs more than twice in the window, it is incorrect.
@@ -182,6 +182,22 @@ class MarkerEventDetection(_BaseEventDetection):
     _LABEL_COLUMN = io._EventInputFileReader.COLUMN_LABEL
     _CONTEXT_COLUMN = io._EventInputFileReader.COLUMN_CONTEXT
     _ICON_COLUMN = io._EventInputFileReader.COLUMN_ICON
+
+    def __init__(self, configs: mapping.MappingConfigs, **kwargs):
+        """Initializes a new instance of the MarkerEventDetection class.
+
+        Args:
+            configs: The mapping configurations.
+            height: The height of peaks for events. Default = None
+            threshold: The threshold for detecting events. Default = None
+            distance: The min distance in frames between events. Default = None
+            rel_height: The relative height of peak for events. Default = 0.5
+        """
+        self._height = kwargs.get("height", None)
+        self._threshold = kwargs.get("threshold", None)
+        self._distance = kwargs.get("distance", None)
+        self._rel_height = kwargs.get("rel_height", 0.5)
+        super().__init__(configs)
 
     def detect_events(self, trial: model.Trial) -> pd.DataFrame:
         """Detects the events in the trial using marker data.
@@ -270,7 +286,7 @@ class MarkerEventDetection(_BaseEventDetection):
 
     @staticmethod
     def _rotate_point(
-        point: xr.DataArray, fix_point: xr.DataArray, angle: float
+            point: xr.DataArray, fix_point: xr.DataArray, angle: float
     ) -> xr.DataArray:
         """Rotate a point around a fixed point.
 
@@ -306,10 +322,11 @@ class MarkerEventDetection(_BaseEventDetection):
         else:
             return [1, 1, 1]
 
-    @staticmethod
-    def _detect_events(
-        sacrum: xr.DataArray, point: xr.DataArray, toe_off: bool
-    ) -> np.ndarray:
+    def _detect_events(self,
+                       sacrum: xr.DataArray,
+                       point: xr.DataArray,
+                       toe_off: bool
+                       ) -> np.ndarray:
         """Detects the events in the trial using projected points.
         Args:
             sacrum: The projected sacrum point.
@@ -324,7 +341,11 @@ class MarkerEventDetection(_BaseEventDetection):
         else:
             distance = point - sacrum
         distance = distance.sel(axis="x").meca.normalize().meca.center()
-        index, heights = sp.signal.find_peaks(distance.to_numpy())
+        index, heights = sp.signal.find_peaks(distance.to_numpy(),
+                                              height=self._height,
+                                              threshold=self._threshold,
+                                              distance=self._distance,
+                                              rel_height=self._rel_height)
 
         # take smaller peaks if toe_off, larger peaks if heel_strike
 
@@ -333,7 +354,7 @@ class MarkerEventDetection(_BaseEventDetection):
         return times
 
     def _create_data_frame(
-        self, times: np.ndarray, context: str, label: str
+            self, times: np.ndarray, context: str, label: str
     ) -> pd.DataFrame:
         """Creates a DataFrame from the detected events.
 
