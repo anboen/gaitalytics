@@ -67,7 +67,7 @@ class _CycleFeaturesCalculation(ABC):
 
     @staticmethod
     def get_event_times(
-        trial_events: pd.DataFrame | None,
+            trial_events: pd.DataFrame | None,
     ) -> tuple[float, float, float, float, float]:
         """Checks the sequence of events in the trial and returns the times.
 
@@ -92,10 +92,10 @@ class _CycleFeaturesCalculation(ABC):
             )
         ipsi = trial_events[
             trial_events[io._EventInputFileReader.COLUMN_CONTEXT] == curren_context
-        ]
+            ]
         contra = trial_events[
             trial_events[io._EventInputFileReader.COLUMN_CONTEXT] != curren_context
-        ]
+            ]
         if len(ipsi) != 3:
             raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
         if len(contra) != 2:
@@ -103,13 +103,13 @@ class _CycleFeaturesCalculation(ABC):
 
         contra_fs = contra[
             contra[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE
-        ]
+            ]
         contra_fo = contra[
             contra[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF
-        ]
+            ]
         ipsi_fs = ipsi[
             ipsi[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE
-        ]
+            ]
         ipsi_fo = ipsi[ipsi[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF]
 
         ipsi_fs_time_start = ipsi_fs[io._EventInputFileReader.COLUMN_TIME].values[0]
@@ -158,7 +158,7 @@ class _CycleFeaturesCalculation(ABC):
 
 class _PointDependentFeature(_CycleFeaturesCalculation, ABC):
     def _get_marker_data(
-        self, trial: model.Trial, marker: mapping.MappedMarkers
+            self, trial: model.Trial, marker: mapping.MappedMarkers
     ) -> xr.DataArray:
         """Get the marker data for a trial.
 
@@ -219,6 +219,7 @@ class TimeSeriesFeatures(_CycleFeaturesCalculation):
             - mean
             - median
             - std
+            - amplitude
 
         Args:
             trial: The trial for which to calculate the features.
@@ -232,9 +233,11 @@ class TimeSeriesFeatures(_CycleFeaturesCalculation):
         mean_feat = markers.mean(dim="time", skipna=True)
         median_feat = markers.median(dim="time", skipna=True)
         std_feat = markers.std(dim="time", skipna=True)
+        amplitude_feat = max_feat - min_feat
         features = xr.concat(
-            [min_feat, max_feat, mean_feat, median_feat, std_feat],
-            pd.Index(["min", "max", "mean", "median", "std"], name="feature"),
+            [min_feat, max_feat, mean_feat, median_feat, std_feat, amplitude_feat],
+            pd.Index(["min", "max", "mean", "median", "std", "amplitude"],
+                     name="feature"),
         )
         return features
 
@@ -291,10 +294,10 @@ class TemporalFeatures(_CycleFeaturesCalculation):
 
     @staticmethod
     def _calculate_supports(
-        contra_fo_time: float,
-        contra_fs_time: float,
-        ipsi_fo_time: float,
-        end_time: float,
+            contra_fo_time: float,
+            contra_fs_time: float,
+            ipsi_fo_time: float,
+            end_time: float,
     ) -> dict[str, float]:
         """Calculate the support times for a trial.
 
@@ -353,10 +356,10 @@ class SpatialFeatures(_PointDependentFeature):
         return self._create_result_from_dict(results_dict)
 
     def _calculate_step_length(
-        self,
-        trial: model.Trial,
-        ipsi_marker: mapping.MappedMarkers,
-        contra_marker: mapping.MappedMarkers,
+            self,
+            trial: model.Trial,
+            ipsi_marker: mapping.MappedMarkers,
+            contra_marker: mapping.MappedMarkers,
     ) -> dict[str, np.ndarray]:
         """Calculate the step length for a trial.
 
@@ -386,10 +389,10 @@ class SpatialFeatures(_PointDependentFeature):
         return {"step_length": distance}
 
     def _calculate_step_width(
-        self,
-        trial: model.Trial,
-        ipsi_marker: mapping.MappedMarkers,
-        contra_marker: mapping.MappedMarkers,
+            self,
+            trial: model.Trial,
+            ipsi_marker: mapping.MappedMarkers,
+            contra_marker: mapping.MappedMarkers,
     ) -> dict[str, np.ndarray]:
         """Calculate the step width for a trial.
 

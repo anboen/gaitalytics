@@ -73,6 +73,9 @@ class TestTimeSeriesFeatures:
                         median_value = features.loc[
                             dict(context=context, channel=marker,
                                  cycle=cycle, feature="median")]
+                        amp_value = features.loc[
+                            dict(context=context, channel=marker, cycle=cycle,
+                                 feature="amplitude")]
 
                         assert min_value <= max_value, \
                             f"Min value is greater than max value for {context}, {marker}, {cycle}"
@@ -84,6 +87,8 @@ class TestTimeSeriesFeatures:
                             f"Min value is greater than max value for {context}, {marker}, {cycle}"
                         assert max_value >= median_value, \
                             f"Min value is greater than max value for {context}, {marker}, {cycle}"
+                        assert amp_value == (max_value - min_value), \
+                            f"Amplitude is not equal to max - min for {context}, {marker}, {cycle}"
                     else:
                         if "Power" in marker or "Force" in marker or "Moment" in marker or "GRF" in marker:
                             assert True
@@ -246,5 +251,3 @@ class TestSpatialFeatures:
         assert rec_value == pytest.approx(
             exp_value,
             rel=1e-1), f"Expected {exp_value}, got {rec_value} in step_length for Right context"
-
-

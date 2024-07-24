@@ -1,5 +1,6 @@
 """This module provides classes for reading biomechanical file-types."""
 
+import math
 from abc import abstractmethod
 from pathlib import Path
 
@@ -60,13 +61,13 @@ class C3dEventFileWriter(_EventFileWriter):
             events: The events to write to the output file.
             file_path: The path to the output file if deviating from the input file.
         """
-        c3d = ezc3d.c3d()
-        n_sections = len(events) // _MAX_EVENTS_PER_SECTION
+        c3d = ezc3d.c3d(str(self.file_path))
+        n_sections = math.ceil(len(events) / _MAX_EVENTS_PER_SECTION)
         for i in range(n_sections):
             start = i * _MAX_EVENTS_PER_SECTION
             end = (i + 1) * _MAX_EVENTS_PER_SECTION
             if end > len(events):
-                end = len(events) - 1
+                end = len(events)
 
             context_label = self._CONTEXT_SECTION
             icon_label = self._ICON_SECTION
@@ -74,18 +75,24 @@ class C3dEventFileWriter(_EventFileWriter):
             time_label = self._TIME_SECTION
 
             if i > 0:
-                context_label += f"_{i + 1}"
-                icon_label += f"_{i + 1}"
-                label_label += f"_{i + 1}"
-                time_label += f"_{i + 1}"
+                context_label += f"{i + 1}"
+                icon_label += f"{i + 1}"
+                label_label += f"{i + 1}"
+                time_label += f"{i + 1}"
             subset_events = events.iloc[start:end]
             c3d.add_parameter("EVENT", context_label, subset_events["context"].tolist())
             c3d.add_parameter("EVENT", icon_label, subset_events["icon_id"].tolist())
             c3d.add_parameter("EVENT", label_label, subset_events["label"].tolist())
 
-            times = [[time // 60, time % 60] for time in subset_events["time"].tolist()]
+            # times = [[time // 60, time % 60] for time in subset_events["time"].tolist()]
+            raw_times = subset_events["time"].to_numpy()
+            minutes = raw_times // 60
+            seconds = raw_times % 60
+
+            times = np.vstack((minutes, seconds))
+
             c3d.add_parameter("EVENT", time_label, times)
-        c3d.add_parameter("EVENT", "used", len(events))
+        c3d.add_parameter("EVENT", "USED", len(events))
         path = file_path if file_path else self.file_path
         c3d.write(str(path))
 

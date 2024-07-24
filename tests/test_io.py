@@ -1,4 +1,5 @@
 import array as arr
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -16,27 +17,45 @@ INPUT_MOT_SMALL: Path = Path('tests/data/test_small.mot')
 INPUT_STO_SMALL: Path = Path('tests/data/test_small.sto')
 
 INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
+INPUT_C3D_BIG_NO_EVENTS: Path = Path('tests/data/test_big_no_events.c3d')
 
-INPUT_HBM2: Path = Path('tests/data/test_hbm2_small.c3d')
 
 
 @pytest.fixture()
 def out_path(request):
+    input_file = INPUT_C3D_BIG_NO_EVENTS
     out = Path('out/test_small_events.c3d')
+
     if out.exists():
         out.unlink()
+    elif not out.parent.exists():
+        out.parent.mkdir(parents=True)
+    shutil.copy(input_file, out)
     return out
 
 
-class FooTestWriteEvents:
+class TestWriteEvents:
 
     def test_write_c3d_events_small(self, out_path):
-        configs = MappingConfigs(Path('tests/config/hbm2_config.yaml'))
-        markers = MarkersInputFileReader(INPUT_HBM2).get_markers()
+        configs = MappingConfigs(Path('tests/config/pig_config.yaml'))
+        markers = MarkersInputFileReader(out_path).get_markers()
         trial = Trial()
         trial.add_data(DataCategory.MARKERS, markers)
         events = MarkerEventDetection(configs).detect_events(trial)
-        C3dEventFileWriter(INPUT_HBM2).write_events(events, out_path)
+        C3dEventFileWriter(out_path).write_events(events)
+
+        rec_events = C3dEventInputFileReader(out_path).get_events()
+
+        assert len(rec_events) == len(events) , f"Expected {len(events)} events, got {len(rec_events)}"
+        for i in range(len(events)):
+            assert rec_events['time'].iloc[i] == pytest.approx(
+                events['time'].iloc[i]), f"Expected {events['time'].iloc[i]}, got {rec_events['time'].iloc[i]}"
+            assert rec_events['label'].iloc[i] == events['label'].iloc[
+                i], f"Expected {events['label'].iloc[i]}, got {rec_events['label'].iloc[i]}"
+            assert rec_events['context'].iloc[i] == events['context'].iloc[
+                i], f"Expected {events['context'].iloc[i]}, got {rec_events['context'].iloc[i]}"
+            assert rec_events['icon_id'].iloc[i] == events['icon_id'].iloc[
+                i], f"Expected {events['icon_id'].iloc[i]}, got {rec_events['icon_id'].iloc[i]}"
 
 
 class TestReadEvents:
