@@ -44,7 +44,7 @@ build = ["build", "setuptools>=64", "setuptools_scm>=8"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autodoc-typehints", "sphinx_github_changelog"]
 
 [tool.pixi.project]
-channels = ["default", "conda-forge"]
+channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tool.pixi.pypi-dependencies]

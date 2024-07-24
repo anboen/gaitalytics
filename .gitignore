@@ -4,6 +4,7 @@ out
 /tests/__pycache__
 _build
 
+/output/
 /playground/
 
 *.py[cod]
