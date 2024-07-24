@@ -88,13 +88,15 @@ class GaitEventsSegmentation(_BaseSegmentation):
         splits = {}
         interesting_events = events[
             events[io._EventInputFileReader.COLUMN_LABEL] == self.event_label
-            ]
+        ]
         contexts = events[io._EventInputFileReader.COLUMN_CONTEXT].unique()
         for context in contexts:
             context_events = interesting_events[
                 interesting_events[io._EventInputFileReader.COLUMN_CONTEXT] == context
-                ]
-            splits[context] = context_events[io._EventInputFileReader.COLUMN_TIME].values
+            ]
+            splits[context] = context_events[
+                io._EventInputFileReader.COLUMN_TIME
+            ].values
         return splits
 
     def _get_segment(

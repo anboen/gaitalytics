@@ -92,10 +92,10 @@ class _CycleFeaturesCalculation(ABC):
             )
         ipsi = trial_events[
             trial_events[io._EventInputFileReader.COLUMN_CONTEXT] == curren_context
-            ]
+        ]
         contra = trial_events[
             trial_events[io._EventInputFileReader.COLUMN_CONTEXT] != curren_context
-            ]
+        ]
         if len(ipsi) != 3:
             raise ValueError(f"Error events sequence {curren_context} nr. {cycle_id}")
         if len(contra) != 2:
@@ -103,11 +103,13 @@ class _CycleFeaturesCalculation(ABC):
 
         contra_fs = contra[
             contra[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE
-            ]
+        ]
         contra_fo = contra[
             contra[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF
-            ]
-        ipsi_fs = ipsi[ipsi[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE]
+        ]
+        ipsi_fs = ipsi[
+            ipsi[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_STRIKE
+        ]
         ipsi_fo = ipsi[ipsi[io._EventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF]
 
         ipsi_fs_time_start = ipsi_fs[io._EventInputFileReader.COLUMN_TIME].values[0]
@@ -250,6 +252,7 @@ class TemporalFeatures(_CycleFeaturesCalculation):
         - step_time
         - cadence
     """
+
     def _calculate(self, trial: model.Trial) -> xr.DataArray:
         """Calculate the support times for a trial.
 
