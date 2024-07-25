@@ -1,4 +1,4 @@
-name: Code Tests
+name: Library Tests
 on:
   workflow_dispatch:
 

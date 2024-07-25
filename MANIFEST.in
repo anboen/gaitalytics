@@ -8,9 +8,12 @@ include LICENSE
 include pyproject.toml
 recursive-include gaitalytics *.py
 
+include ./tests/test_api.py
+include ./tests/test_small.c3d
+include ./tests/pig_config.yaml
 
-prune docs/_build
-prune build
-prune tests
-prune docs
+
+prune tests/data
+prune tests/config
 prune conda.recipe
+

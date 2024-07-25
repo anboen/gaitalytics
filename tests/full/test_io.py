@@ -11,13 +11,13 @@ from gaitalytics.io import C3dEventInputFileReader, MarkersInputFileReader, \
 from gaitalytics.mapping import MappingConfigs
 from gaitalytics.model import Trial, DataCategory
 
-INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
-INPUT_TRC_SMALL: Path = Path('tests/data/test_small.trc')
-INPUT_MOT_SMALL: Path = Path('tests/data/test_small.mot')
-INPUT_STO_SMALL: Path = Path('tests/data/test_small.sto')
+INPUT_C3D_SMALL: Path = Path('./tests/full/data/test_small.c3d')
+INPUT_TRC_SMALL: Path = Path('./tests/full/data/test_small.trc')
+INPUT_MOT_SMALL: Path = Path('./tests/full/data/test_small.mot')
+INPUT_STO_SMALL: Path = Path('./tests/full/data/test_small.sto')
 
-INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
-INPUT_C3D_BIG_NO_EVENTS: Path = Path('tests/data/test_big_no_events.c3d')
+INPUT_C3D_BIG: Path = Path('./tests/full/data/test_big.c3d')
+INPUT_C3D_BIG_NO_EVENTS: Path = Path('./tests/full/data/test_big_no_events.c3d')
 
 
 @pytest.fixture()
@@ -36,7 +36,7 @@ def out_path(request):
 class TestWriteEvents:
 
     def test_write_c3d_events_small(self, out_path):
-        configs = MappingConfigs(Path('tests/config/pig_config.yaml'))
+        configs = MappingConfigs(Path('./tests/full/config/pig_config.yaml'))
         markers = MarkersInputFileReader(out_path).get_markers()
         trial = Trial()
         trial.add_data(DataCategory.MARKERS, markers)
@@ -165,7 +165,7 @@ class TestAnalogs:
 
 class TestAnalysis:
     def test_c3d_analysis_small(self):
-        configs = MappingConfigs(Path('tests/config/pig_config.yaml'))
+        configs = MappingConfigs(Path('./tests/full/config/pig_config.yaml'))
         analysis = AnalysisInputReader(INPUT_C3D_SMALL, configs).get_analysis()
         rec_value = analysis.shape[0]
         exp_value = 126
@@ -176,7 +176,7 @@ class TestAnalysis:
         assert rec_value == exp_value
 
     def test_reshape(self):
-        configs = MappingConfigs(Path('tests/config/pig_config.yaml'))
+        configs = MappingConfigs(Path('./tests/full/config/pig_config.yaml'))
         analysis = AnalysisInputReader(INPUT_C3D_SMALL, configs).get_analysis()
         markers = MarkersInputFileReader(INPUT_C3D_SMALL).get_markers()
 

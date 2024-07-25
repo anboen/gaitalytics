@@ -11,13 +11,13 @@ from gaitalytics.mapping import MappingConfigs
 from gaitalytics.model import DataCategory, Trial, TrialCycles, trial_from_hdf5
 from gaitalytics.segmentation import GaitEventsSegmentation
 
-INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
+INPUT_C3D_SMALL: Path = Path('./tests/full/data/test_small.c3d')
 OUTPUT_PATH_SMALL: Path = Path('out/test_small')
 
-INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
+INPUT_C3D_BIG: Path = Path('./tests/full/data/test_big.c3d')
 OUTPUT_PATH_BIG: Path = Path('out/test_big')
 
-CONFIG_FILE: Path = Path('tests/config/pig_config.yaml')
+CONFIG_FILE: Path = Path('./tests/full/config/pig_config.yaml')
 
 
 @pytest.fixture()

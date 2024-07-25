@@ -29,12 +29,16 @@ requirements:
     - ezc3d >=1.5.10,*=*python*
 
 test:
+  source_files:
+    - tests/
   imports:
     - gaitalytics
   commands:
     - pip check
+    - pytest ./tests
   requires:
     - pip
+    - pytest
 
 
 about:

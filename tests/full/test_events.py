@@ -7,11 +7,11 @@ from gaitalytics.io import C3dEventInputFileReader, MarkersInputFileReader
 from gaitalytics.mapping import MappingConfigs
 from gaitalytics.model import DataCategory, Trial
 
-INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
+INPUT_C3D_SMALL: Path = Path('./tests/full/data/test_small.c3d')
 OUTPUT_PATH_SMALL: Path = Path('out/test_small')
-CONFIG_FILE: Path = Path('tests/config/pig_config.yaml')
+CONFIG_FILE: Path = Path('./tests/full/config/pig_config.yaml')
 
-INPUT_C3D_BIG: Path = Path('tests/data/test_big.c3d')
+INPUT_C3D_BIG: Path = Path('./tests/full/data/test_big.c3d')
 OUTPUT_PATH_BIG: Path = Path('out/test_big')
 
 

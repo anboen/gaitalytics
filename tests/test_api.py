@@ -20,36 +20,36 @@ def out_path(request):
 
 
 def test_load_config():
-    config = api.load_config("tests/config/pig_config.yaml")
+    config = api.load_config("./tests/pig_config.yaml")
     marker_name = config.get_marker_mapping(mapping.MappedMarkers.SACRUM)
     assert marker_name == "SACR"
 
 
 def test_load_c3d_trial():
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     assert len(trial.get_all_data().keys()) == 3
     assert trial.events is not None
 
 
 def test_detect_events():
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     event_table = api.detect_events(trial, config, distance=1000)
     assert event_table is not None
     assert len(event_table) == 4
 
 
 def test_detect_events_methode():
-    config = api.load_config("tests/config/pig_config.yaml")
+    config = api.load_config("./tests/pig_config.yaml")
     trial = model.Trial()
     with pytest.raises(ValueError):
         api.detect_events(trial, config, method="ForcePlate")
 
 
 def test_check_events():
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     api.check_events(trial.events)
     assert True
 
@@ -60,16 +60,16 @@ def test_check_events_methode():
 
 
 def test_write_events(out_path):
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     event_table = api.detect_events(trial, config, distance=1000)
-    api.write_events_to_c3d("tests/data/test_small.c3d", event_table, out_path)
+    api.write_events_to_c3d("./tests/test_small.c3d", event_table, out_path)
     assert True
 
 
 def test_segment_trial():
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     segm_trial = api.segment_trial(trial)
     assert len(segm_trial.get_all_cycles().keys()) == 2
 
@@ -87,23 +87,23 @@ def test_segment_trial_method():
 
 
 def test_time_normalize_trail():
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     norm_trial = api.time_normalise_trial(trial)
     assert norm_trial is not None
 
 
 def test_time_normalize_cycle_trial():
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     trial_cycles = api.segment_trial(trial)
     norm_trial = api.time_normalise_trial(trial_cycles)
     assert norm_trial is not None
 
 
 def test_time_normalize_trial_frames():
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     trial_cycles = api.segment_trial(trial)
     norm_trial = api.time_normalise_trial(trial_cycles, n_frames=200)
     markers = norm_trial.get_cycle("Left", 0).get_data(model.DataCategory.MARKERS)
@@ -111,8 +111,8 @@ def test_time_normalize_trial_frames():
 
 
 def test_calculate_features():
-    config = api.load_config("tests/config/pig_config.yaml")
-    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    config = api.load_config("./tests/pig_config.yaml")
+    trial = api.load_c3d_trial("./tests/test_small.c3d", config)
     trial_cycles = api.segment_trial(trial)
     features = api.calculate_features(trial_cycles, config)
     assert features.shape == (2, 2, 2278)

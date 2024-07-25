@@ -10,7 +10,7 @@ from gaitalytics.segmentation import GaitEventsSegmentation
 
 @pytest.fixture()
 def small_trial(request):
-    INPUT_C3D_SMALL: Path = Path('tests/data/test_small.c3d')
+    INPUT_C3D_SMALL: Path = Path('./tests/full/data/test_small.c3d')
     markers = MarkersInputFileReader(INPUT_C3D_SMALL).get_markers()
     analogs = AnalogsInputFileReader(INPUT_C3D_SMALL).get_analogs()
     events = C3dEventInputFileReader(INPUT_C3D_SMALL).get_events()
@@ -24,7 +24,7 @@ def small_trial(request):
 
 @pytest.fixture()
 def big_trial(request):
-    INPUT_C3D_SMALL: Path = Path('tests/data/test_big.c3d')
+    INPUT_C3D_SMALL: Path = Path('./tests/full/data/test_big.c3d')
     markers = MarkersInputFileReader(INPUT_C3D_SMALL).get_markers()
     analogs = AnalogsInputFileReader(INPUT_C3D_SMALL).get_analogs()
     events = C3dEventInputFileReader(INPUT_C3D_SMALL).get_events()
