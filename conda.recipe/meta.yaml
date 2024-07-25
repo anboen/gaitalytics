@@ -1,13 +1,13 @@
 {% set name = "gaitalytics" %}
-{% set version = "0.0.2" %}
+{% set version = "0.0.3.dev0+g5b3a862.d20240725" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/anboen/gaitalytics/releases/download/v{{ version }}/gaitalytics-{{ version }}.tar.gz
-  sha256: de84e7126b9e8d51c937d13c33bfdfa7fa8a626fd55f4735c795f10287068bea
+  url: ../dist/gaitalytics-${{ version }}.tar.gz
+
 build:
   noarch: python
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
@@ -35,7 +35,7 @@ test:
     - gaitalytics
   commands:
     - pip check
-    - pytest ./tests
+    - pytest ./tests/test-api.py
   requires:
     - pip
     - pytest
@@ -46,6 +46,8 @@ about:
   summary: This library provides tools to analyze motion capture data.
   license: MIT
   license_family: MIT
+  dev_url: https://github.com/anboen/gaitalytics
+  doc_url: https://pypi.python.org/pypi/imagesize
 
 extra:
   recipe-maintainers:

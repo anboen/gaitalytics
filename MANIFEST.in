@@ -13,7 +13,6 @@ include ./tests/test_small.c3d
 include ./tests/pig_config.yaml
 
 
-prune tests/data
-prune tests/config
+prune tests/full
 prune conda.recipe
 
