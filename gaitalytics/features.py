@@ -12,8 +12,13 @@ import gaitalytics.utils.linalg as linalg
 import gaitalytics.utils.mocap as mocap
 
 
-class _CycleFeaturesCalculation(ABC):
-    def __init__(self, config: mapping.MappingConfigs, **kwargs):
+class FeatureCalculation(ABC):
+    """Base class for feature calculations.
+
+    This class provides a common interface for calculating features.
+    """
+
+    def __init__(self, config: mapping.MappingConfigs):
         """Initializes a new instance of the BaseFeatureCalculation class.
 
         Args:
@@ -21,6 +26,20 @@ class _CycleFeaturesCalculation(ABC):
         """
         self._config = config
 
+    @abstractmethod
+    def calculate(self, trial: model.TrialCycles) -> xr.DataArray:
+        """Calculate the features for a trial.
+
+        Args:
+            trial: The trial for which to calculate the features.
+
+        Returns:
+            An xarray DataArray containing the calculated features.
+        """
+        raise NotImplementedError
+
+
+class _CycleFeaturesCalculation(FeatureCalculation, ABC):
     def calculate(self, trial: model.TrialCycles) -> xr.DataArray:
         """Calculate the features for a trial.
 
@@ -155,6 +174,36 @@ class _CycleFeaturesCalculation(ABC):
         }
         return xr.DataArray.from_dict(xr_dict)
 
+    @staticmethod
+    def _flatten_features(features: xr.DataArray) -> xr.DataArray:
+        """Flatten the features into a single dimension.
+
+        The dimension channel will be integrated into the features dim
+
+        Args:
+            features: The features to be flattened.
+
+        Returns:
+            The reshaped features.
+        """
+
+        np_data = features.to_numpy()
+        rs_data = np_data.reshape((np_data.shape[1] * np_data.shape[0]), order="C")
+
+        feature = features.coords["feature"].values
+        channel = features.coords["channel"].values
+        new_labels = []
+        for f in feature:
+            for c in channel:
+                new_labels.append(f"{c}_{f}")
+
+        new_format = xr.DataArray(
+            rs_data,
+            coords={"feature": new_labels},
+            dims=["feature"],
+        )
+        return new_format
+
 
 class _PointDependentFeature(_CycleFeaturesCalculation, ABC):
     def _get_marker_data(
@@ -227,6 +276,28 @@ class TimeSeriesFeatures(_CycleFeaturesCalculation):
         Returns:
             An xarray DataArray containing the calculated features.
         """
+        features = self._calculate_features(trial)
+        return self._flatten_features(features)
+
+    @staticmethod
+    def _calculate_features(trial: model.Trial) -> xr.DataArray:
+        """Calculate the time series features for a trial.
+
+        Following features are calculated:
+            - min
+            - max
+            - mean
+            - median
+            - std
+            - amplitude
+
+
+        Args:
+            trial: The trial for which to calculate the features.
+
+        Returns:
+            An xarray DataArray containing the calculated features.
+        """
         markers = trial.get_data(model.DataCategory.ANALYSIS)
         min_feat = markers.min(dim="time", skipna=True)
         max_feat = markers.max(dim="time", skipna=True)
@@ -240,7 +311,91 @@ class TimeSeriesFeatures(_CycleFeaturesCalculation):
                 ["min", "max", "mean", "median", "std", "amplitude"], name="feature"
             ),
         )
+
         return features
+
+
+class PhaseTimeSeriesFeatures(TimeSeriesFeatures):
+    """Calculate phase time series features for a trial.
+
+    This class calculates following phase time series features for a trial.
+        - stand_min
+        - stand_max
+        - stand_mean
+        - stand_median
+        - stand_std
+        - stand_amplitude
+        - swing_min
+        - swing_max
+        - swing_mean
+        - swing_median
+        - swing_std
+        - swing_amplitude
+    """
+
+    def _calculate(self, trial: model.Trial) -> xr.DataArray:
+        """Calculate the time series features for a trial by phase.
+
+        Following features are calculated:
+            - stand_min
+            - stand_max
+            - stand_mean
+            - stand_median
+            - stand_std
+            - stand_amplitude
+            - swing_min
+            - swing_max
+            - swing_mean
+            - swing_median
+            - swing_std
+            - swing_amplitude
+
+        Args:
+            trial: The trial for which to calculate the features.
+
+        Returns:
+            An xarray DataArray containing the calculated features.
+        """
+        event_table = trial.events
+        analysis_data = trial.get_data(model.DataCategory.ANALYSIS)
+
+        context = analysis_data.attrs["context"]
+
+        event_ipsi = event_table[
+            event_table[io.C3dEventInputFileReader.COLUMN_CONTEXT] == context  # type: ignore
+        ]
+        event_ipsi_fo = event_ipsi[
+            event_table[io.C3dEventInputFileReader.COLUMN_LABEL] == events.FOOT_OFF  # type: ignore
+        ]
+        fo_time = round(event_ipsi_fo.time.values[0], 4)
+        start_time = analysis_data.coords["time"].values[0]
+        end_time = analysis_data.coords["time"].values[-1]
+
+        stand_trial = self._create_phase_trial(trial, slice(start_time, fo_time))
+        swing_trial = self._create_phase_trial(trial, slice(fo_time, end_time))
+        stand_features = super()._calculate(stand_trial)
+        stand_features.assign_coords(
+            feature=[f"{f}_swing" for f in stand_features.feature.values]
+        )
+        swing_features = super()._calculate(swing_trial)
+        swing_features.assign_coords(
+            feature=[f"{f}_swing" for f in swing_features.feature.values]
+        )
+
+        return xr.concat([stand_features, swing_features], dim="feature")
+
+    @staticmethod
+    def _create_phase_trial(trial: model.Trial, time_slice: slice):
+        """Create a trial containing only the data for a specific phase.
+
+        Args:
+            trial: The trial to create the phase trial from.
+            time_slice: The time slice to extract the phase data from.
+        """
+        phase_trial = model.Trial()
+        for data_category, data in trial.get_all_data().items():
+            phase_trial.add_data(data_category, data.sel(time=time_slice))
+        return phase_trial
 
 
 class TemporalFeatures(_CycleFeaturesCalculation):

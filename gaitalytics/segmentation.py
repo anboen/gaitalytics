@@ -125,14 +125,11 @@ class GaitEventsSegmentation(_BaseSegmentation):
         for category, data in trial.get_all_data().items():
             rate = int(data.attrs["rate"])
             dec_places = ga_math.get_decimal_places(1 / rate)
-            # round_start = round(start_time, dec_places)
-            # round_end = round(end_time, dec_places)
 
             segment = data.sel(time=slice(start_time, end_time))
             segment = segment.reset_index("time")
 
-            # times = (segment.time.round(rate) - round_start).round(rate).to_numpy()
-            times = (segment.time - start_time).round(rate).to_numpy()
+            times = (segment.time - start_time).to_numpy()
             times = np.round(times, dec_places)
             times = np.absolute(times)
 

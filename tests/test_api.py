@@ -108,3 +108,11 @@ def test_time_normalize_trial_frames():
     norm_trial = api.time_normalise_trial(trial_cycles, n_frames=200)
     markers = norm_trial.get_cycle("Left", 0).get_data(model.DataCategory.MARKERS)
     assert markers.shape[2] == 200
+
+
+def test_calculate_features():
+    config = api.load_config("tests/config/pig_config.yaml")
+    trial = api.load_c3d_trial("tests/data/test_small.c3d", config)
+    trial_cycles = api.segment_trial(trial)
+    features = api.calculate_features(trial_cycles, config)
+    assert features.shape == (2, 2, 2278)

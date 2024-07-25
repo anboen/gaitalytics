@@ -128,19 +128,19 @@ class TestTrial:
         rec_value = len(trial.get_data(DataCategory.MARKERS).coords["channel"])
         exp_value = 382
 
-        assert rec_value == exp_value, f"Expected {exp_value} markers, got {rec_value}"
+        assert rec_value == exp_value
 
     def test(self, trial_small):
         rec_value = len(trial_small.get_all_data())
         exp_value = 3
-        assert rec_value == exp_value, f"Expected {exp_value} data categories, got {rec_value}"
+        assert rec_value == exp_value
 
     def test_save_empty_to_hdf5(self, output_file_path_small):
         trial = Trial()
         with pytest.raises(ValueError):
             trial.to_hdf5(output_file_path_small)
 
-        assert not output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"
+        assert not output_file_path_small.exists()
 
     def test_save_to_existing_hdf5(self, trial_small, output_file_path_small):
         trial_small.to_hdf5(output_file_path_small)
@@ -150,12 +150,12 @@ class TestTrial:
     def test_save_to_hdf5(self, trial_small, output_file_path_small):
         trial_small.to_hdf5(output_file_path_small)
 
-        assert output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"
+        assert output_file_path_small.exists()
 
         with netcdf.File(output_file_path_small, 'r') as f:
             rec_value = len(f.groups.keys())
             exp_value = 4
-            assert rec_value == exp_value, f"Expected {exp_value} datasets, got {rec_value}"
+            assert rec_value == exp_value
 
     def test_load_hdf5(self, trial_small, output_file_path_small):
         trial_small.to_hdf5(output_file_path_small)
@@ -164,20 +164,20 @@ class TestTrial:
 
         rec_value = len(loaded_trial.get_all_data())
         exp_value = 3
-        assert rec_value == exp_value, f"Expected {exp_value} data categories, got {rec_value}"
+        assert rec_value == exp_value
 
-        assert loaded_trial.events is not None, "Expected events to be loaded, but they are not"
+        assert loaded_trial.events is not None
         del loaded_trial
 
     def test_save_to_hdf5_big(self, trial_big, output_file_path_big):
         trial_big.to_hdf5(output_file_path_big)
 
-        assert output_file_path_big.exists(), f"Expected {output_file_path_big} to exist, but it does not"
+        assert output_file_path_big.exists()
 
         with netcdf.File(output_file_path_big, 'r') as f:
             rec_value = len(f.groups.keys())
             exp_value = 4
-            assert rec_value == exp_value, f"Expected {exp_value} datasets, got {rec_value}"
+            assert rec_value == exp_value
 
     def test_load_hdf5_big(self, trial_big, output_file_path_big):
         trial_big.to_hdf5(output_file_path_big)
@@ -186,9 +186,9 @@ class TestTrial:
 
         rec_value = len(loaded_trial.get_all_data())
         exp_value = 3
-        assert rec_value == exp_value, f"Expected {exp_value} data categories, got {rec_value}"
+        assert rec_value == exp_value
 
-        assert loaded_trial.events is not None, "Expected events to be loaded, but they are not"
+        assert loaded_trial.events is not None
         del loaded_trial
 
     def test_save_to_folder(self, trial_small, output_path_small):
@@ -202,13 +202,13 @@ class TestSegmentedTrial:
         with pytest.raises(ValueError):
             trial.to_hdf5(output_path_small)
 
-        assert not output_path_small.exists(), f"Expected {output_path_small} to exist, but it does not"
+        assert not output_path_small.exists()
 
     def test_to_hdf5_small(self, trial_small, output_path_small):
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
         segments.to_hdf5(output_path_small)
 
-        assert output_path_small.exists(), f"Expected {output_path_small} to exist, but it does not"
+        assert output_path_small.exists()
 
     def test_to_write_cycle(self, trial_small, output_file_path_small):
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
@@ -216,19 +216,18 @@ class TestSegmentedTrial:
             DataCategory.MARKERS)
         trial.to_netcdf(output_file_path_small, group="Left/0/markers", engine="h5netcdf")
 
-        assert output_file_path_small.exists(), f"Expected {output_file_path_small} to exist, but it does not"
-
+        assert output_file_path_small.exists()
     def test_to_hdf5_big(self, trial_big, output_path_big):
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_big)
         segments.to_hdf5(output_path_big)
 
-        assert output_path_big.exists(), f"Expected {output_path_big} to exist, but it does not"
+        assert output_path_big.exists()
 
     def test_load_hdf5_small(self, trial_small, output_path_small):
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
         segments.to_hdf5(output_path_small)
         trial = trial_from_hdf5(output_path_small)
-        assert output_path_small.exists(), f"Expected {output_path_small} to exist, but it does not"
+        assert output_path_small.exists()
 
     def test_file_not_found(self):
         with pytest.raises(FileNotFoundError):
@@ -249,8 +248,8 @@ class TestSegmentedTrial:
                 for event_time in event_times:
                     exp_value = markers.coords["time"][0]
                     rec_value = round(event_time,2)
-                    assert rec_value >= exp_value, f"Expected {exp_value} time, got {rec_value}"
+                    assert rec_value >= exp_value
 
                     exp_value = markers.coords["time"][-1]
                     rec_value = round(event_time, 2)
-                    assert rec_value <= exp_value, f"Expected {exp_value} time, got {rec_value}"
+                    assert rec_value <= exp_value

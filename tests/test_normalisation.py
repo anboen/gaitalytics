@@ -65,12 +65,12 @@ class TestLinearTimeNormalisation:
         rec_value = len(
             normalised_trial.get_data(DataCategory.MARKERS).loc["x", "LHipAngles"])
         exp_value = 100
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} after normalisation"
+        assert rec_value == exp_value
 
         rec_value = len(
             normalised_trial.get_data(DataCategory.ANALOGS).loc["Force.Fx1"])
         exp_value = 100
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} after normalisation"
+        assert rec_value == exp_value
 
     def test_normalisation_segment_trial(self, trial_small):
         normaliser = LinearTimeNormaliser()
@@ -83,11 +83,11 @@ class TestLinearTimeNormalisation:
 
         rec_value = len(hip)
         exp_value = 100
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} after normalisation"
+        assert rec_value == exp_value
 
         rec_value = len(force)
         exp_value = 100
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} after normalisation"
+        assert rec_value == exp_value
 
     def test_normalisation_segment_trial_big(self, trial_big):
         normaliser = LinearTimeNormaliser()
@@ -100,11 +100,11 @@ class TestLinearTimeNormalisation:
 
         rec_value = len(hip)
         exp_value = 100
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} after normalisation"
+        assert rec_value == exp_value
 
         rec_value = len(force)
         exp_value = 100
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} after normalisation"
+        assert rec_value == exp_value
 
     def test_normalisation_segment_trial_reload(self, trial_small, output_path_small):
         segments = GaitEventsSegmentation("Foot Strike").segment(trial_small)
@@ -120,8 +120,8 @@ class TestLinearTimeNormalisation:
 
         rec_value = len(hip)
         exp_value = 100
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} after normalisation"
+        assert rec_value == exp_value
 
         rec_value = len(force)
         exp_value = 100
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} after normalisation"
+        assert rec_value == exp_value

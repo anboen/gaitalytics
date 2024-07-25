@@ -68,25 +68,25 @@ class TestMarkerEventDetection:
         events = events.drop(0).reset_index(drop=True)  # can't detect first event
         rec_value = len(pred_events)
         exp_value = len(events)
-        assert rec_value == exp_value, f"Expected {exp_value} events, got {rec_value}"
+        assert rec_value == exp_value
 
         for i in range(0, len(pred_events)):
             rec_value = abs(
                 pred_events.iloc[i].loc['time'] - events.iloc[i].loc['time'])
             exp_value = 0.2
-            assert rec_value < exp_value, f"Max Expected diff time {exp_value} , got {rec_value}"
+            assert rec_value < exp_value
 
             rec_value = pred_events.iloc[i].loc['label']
             exp_value = events.iloc[i].loc['label']
-            assert rec_value == exp_value, f"Expected {exp_value} label, got {rec_value}"
+            assert rec_value == exp_value
 
             rec_value = pred_events.iloc[i].loc['context']
             exp_value = events.iloc[i].loc['context']
-            assert rec_value == exp_value, f"Expected {exp_value} context, got {rec_value}"
+            assert rec_value == exp_value
 
             rec_value = pred_events.iloc[i].loc['icon_id']
             exp_value = events.iloc[i].loc['icon_id']
-            assert rec_value == exp_value, f"Expected {exp_value} icon, got {rec_value}"
+            assert rec_value == exp_value
 
     def test_big(self, trial_big, config):
         pred_events = MarkerEventDetection(config).detect_events(trial_big)
@@ -94,21 +94,21 @@ class TestMarkerEventDetection:
 
         rec_value = len(pred_events)
         exp_value = len(events)
-        assert rec_value == exp_value, f"Expected {exp_value} events, got {rec_value}"
+        assert rec_value == exp_value
 
         for i in range(len(pred_events)):
             rec_value = pred_events.iloc[i].loc['time'] - events.iloc[i].loc['time']
             exp_value = 2
-            assert rec_value < exp_value, f"Max Expected diff time {exp_value} , got {rec_value}"
+            assert rec_value < exp_value
 
             rec_value = pred_events.iloc[i].loc['label']
             exp_value = events.iloc[i].loc['label']
-            assert rec_value == exp_value, f"Expected {exp_value} label, got {rec_value}"
+            assert rec_value == exp_value
 
             rec_value = pred_events.iloc[i].loc['context']
             exp_value = events.iloc[i].loc['context']
-            assert rec_value == exp_value, f"Expected {exp_value} context, got {rec_value}"
+            assert rec_value == exp_value
 
             rec_value = pred_events.iloc[i].loc['icon_id']
             exp_value = events.iloc[i].loc['icon_id']
-            assert rec_value == exp_value, f"Expected {exp_value} icon, got {rec_value}"
+            assert rec_value == exp_value

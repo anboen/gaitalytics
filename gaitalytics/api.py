@@ -3,8 +3,10 @@ from inspect import signature, Parameter
 from pathlib import Path
 
 import pandas as pd
+import xarray as xr
 
 import gaitalytics.events as events
+import gaitalytics.features as features
 import gaitalytics.io as io
 import gaitalytics.mapping as mapping
 import gaitalytics.model as model
@@ -57,7 +59,7 @@ def load_config(config_path: Path | str) -> mapping.MappingConfigs:
     Returns:
         A MappingConfigs object.
     """
-    return mapping.MappingConfigs(config_path)
+    return mapping.MappingConfigs(config_path)  # type: ignore
 
 
 @_PathConverter
@@ -76,10 +78,10 @@ def load_c3d_trial(
     Returns:
         A Trial object.
     """
-    markers = io.MarkersInputFileReader(c3d_file).get_markers()
-    analogs = io.AnalogsInputFileReader(c3d_file).get_analogs()
-    analysis = io.AnalysisInputReader(c3d_file, configs).get_analysis()
-    event_table = io.C3dEventInputFileReader(c3d_file).get_events()
+    markers = io.MarkersInputFileReader(c3d_file).get_markers()  # type: ignore
+    analogs = io.AnalogsInputFileReader(c3d_file).get_analogs()  # type: ignore
+    analysis = io.AnalysisInputReader(c3d_file, configs).get_analysis()  # type: ignore
+    event_table = io.C3dEventInputFileReader(c3d_file).get_events()  # type: ignore
 
     trial = model.Trial()
     trial.add_data(model.DataCategory.MARKERS, markers)
@@ -153,7 +155,7 @@ def write_events_to_c3d(
         output_path: The path to write the c3d file with the events.
         If None, the original file will be overwritten.
     """
-    io.C3dEventFileWriter(c3d_path).write_events(event_table, output_path)
+    io.C3dEventFileWriter(c3d_path).write_events(event_table, output_path)  # type: ignore
 
 
 def segment_trial(trial: model.Trial, method: str = "HS") -> model.TrialCycles:
@@ -199,3 +201,53 @@ def time_normalise_trial(
 
     trial = normaliser.normalise(trial)
     return trial
+
+
+def calculate_features(
+    trial: model.TrialCycles,
+    config: mapping.MappingConfigs,
+    methods: list | tuple = (
+        features.TimeSeriesFeatures,
+        features.PhaseTimeSeriesFeatures,
+        features.TemporalFeatures,
+        features.SpatialFeatures,
+    ),
+    **kwargs,
+) -> xr.DataArray:
+    """Calculates the features of the trial.
+
+    Args:
+        trial: The trial to calculate the features for.
+        config: The mapping configurations
+        methods: Class objects of the feature calculation methods to use.
+
+    Returns:
+        The trial with the calculated features.
+    """
+    method_objs = create_feature_methods(methods, config, **kwargs)
+    feature_list = []
+    for method in method_objs:
+        feature_list.append(method.calculate(trial))
+    feature_array = xr.concat(feature_list, dim="feature")
+    return feature_array
+
+
+def create_feature_methods(
+    methods: list[type] | tuple[type], config: mapping.MappingConfigs, **kwargs
+) -> list[features.FeatureCalculation]:
+    """Checks the feature calculation methods.
+
+    Args:
+        methods: The list of feature calculation methods to use.
+        config: The mapping configurations
+        **kwargs: Additional keyword arguments for the methods.
+
+    Returns:
+        A list of the feature calculation method objects.
+    """
+    method_objects = []
+    for method in methods:
+        if not issubclass(method, features.FeatureCalculation):
+            raise ValueError(f"Unsupported method: {method}")
+        method_objects.append(method(config, **kwargs))
+    return method_objects

@@ -45,81 +45,56 @@ class TestWriteEvents:
 
         rec_events = C3dEventInputFileReader(out_path).get_events()
 
-        assert len(rec_events) == len(
-            events), f"Expected {len(events)} events, got {len(rec_events)}"
+        assert len(rec_events) == len(events)
         for i in range(len(events)):
-            assert rec_events['time'].iloc[i] == pytest.approx(
-                events['time'].iloc[
-                    i]), f"Expected {events['time'].iloc[i]}, got {rec_events['time'].iloc[i]}"
-            assert rec_events['label'].iloc[i] == events['label'].iloc[
-                i], f"Expected {events['label'].iloc[i]}, got {rec_events['label'].iloc[i]}"
-            assert rec_events['context'].iloc[i] == events['context'].iloc[
-                i], f"Expected {events['context'].iloc[i]}, got {rec_events['context'].iloc[i]}"
-            assert rec_events['icon_id'].iloc[i] == events['icon_id'].iloc[
-                i], f"Expected {events['icon_id'].iloc[i]}, got {rec_events['icon_id'].iloc[i]}"
+            assert rec_events['time'].iloc[i] == pytest.approx(events['time'].iloc[ i])
+            assert rec_events['label'].iloc[i] == events['label'].iloc[i]
+            assert rec_events['context'].iloc[i] == events['context'].iloc[i]
+            assert rec_events['icon_id'].iloc[i] == events['icon_id'].iloc[i]
 
 
 class TestReadEvents:
     def test_c3d_events_small(self):
         c3d_events = C3dEventInputFileReader(INPUT_C3D_SMALL)
         events = c3d_events.get_events()
-        assert len(events) == 13, f"Expected 13 events, got {len(events)}"
-        assert events["time"].iloc[0] == pytest.approx(
-            2.5), f"Expected 2.5, got {events['time'].iloc[0]}"
-        assert events["label"].iloc[
-                   0] == "Foot Off", f"Expected Foot Off, got {events['label'].iloc[0]}"
-        assert events["context"].iloc[
-                   0] == "Right", f"Expected Right, got {events['context'].iloc[0]}"
-        assert events["icon_id"].iloc[
-                   0] == 2, f"Expected 2, got {events['context'].iloc[0]}"
+        assert len(events) == 13
+        assert events["time"].iloc[0] == pytest.approx(2.5)
+        assert events["label"].iloc[0] == "Foot Off"
+        assert events["context"].iloc[0] == "Right"
+        assert events["icon_id"].iloc[0] == 2
 
     def test_c3d_events_big(self):
         c3d_events = C3dEventInputFileReader(INPUT_C3D_BIG)
         events = c3d_events.get_events()
-        assert len(events) == 865, f"Expected 865 events, got {len(events)}"
+        assert len(events) == 865
 
         # Test first event
-        assert events["time"].iloc[0] == pytest.approx(
-            1.03), f"Expected 1.03, got {events['time'].iloc[0]}"
-        assert events["label"].iloc[
-                   0] == "Foot Off", f"Expected Foot Off, got {events['label'].iloc[0]}"
-        assert events["context"].iloc[
-                   0] == "Left", f"Expected Left, got {events['context'].iloc[0]}"
-        assert events["icon_id"].iloc[
-                   0] == 2, f"Expected 2, got {events['context'].iloc[0]}"
-
+        assert events["time"].iloc[0] == pytest.approx(1.03)
+        assert events["label"].iloc[0] == "Foot Off"
+        assert events["context"].iloc[0] == "Left"
+        assert events["icon_id"].iloc[0] == 2
         # Test last event
-        assert events["time"].iloc[-1] == pytest.approx(
-            249.91), f"Expected 1.03, got {events['time'].iloc[-1]}"
-        assert events["label"].iloc[
-                   -1] == "Foot Off", f"Expected Foot Off, got {events['label'].iloc[-1]}"
-        assert events["context"].iloc[
-                   -1] == "Left", f"Expected Left, got {events['context'].iloc[-1]}"
-        assert events["icon_id"].iloc[
-                   -1] == 2, f"Expected 2, got {events['context'].iloc[-1]}"
+        assert events["time"].iloc[-1] == pytest.approx(249.91)
+        assert events["label"].iloc[-1] == "Foot Off"
+        assert events["context"].iloc[-1] == "Left"
+        assert events["icon_id"].iloc[-1] == 2
 
 
 class TestMarkers:
     def test_c3d_markers_small(self):
         c3d_markers = MarkersInputFileReader(INPUT_C3D_SMALL)
         markers = c3d_markers.get_markers()
-        assert len(
-            markers.coords[
-                'channel']) == 191, f"Expected 191 markers, got {len(markers)}"
+        assert len(markers.coords['channel']) == 191
         exp_x_values = arr.array('f', [-1300.67626953, -1290.06420898, -1275.91687012,
                                        -1258.42175293, -1237.95727539])
-        assert (markers.loc['x', 'RTOE'][0:5].data == exp_x_values).all(), \
-            f"Expected {exp_x_values} , got {markers['x', 'RTOE', 0:5].data}"
-        assert markers.coords['time'][0] == 2.48, \
-            f"Expected {2.49}, got {markers.coords['time'].loc[0]}"
+        assert (markers.loc['x', 'RTOE'][0:5].data == exp_x_values).all()
 
+        assert markers.coords['time'][0] == 2.48
     def test_c3d_markers_big(self):
         c3d_markers = MarkersInputFileReader(INPUT_C3D_BIG)
         markers = c3d_markers.get_markers()
         # Test markers length
-        assert len(
-            markers.coords[
-                'channel']) == 127, f"Expected 127 markers, got {len(markers)}"
+        assert len(markers.coords['channel']) == 127
 
         # Test first 5 and last 5 x values of LASIS
         exp_x_values = arr.array('f',
@@ -127,8 +102,7 @@ class TestMarkers:
                                   152.36070251,
                                   152.38232422])
         rec_x_values = markers.loc['x', 'LASIS'][0:5].data
-        assert (
-                rec_x_values == exp_x_values).all(), f"Expected {exp_x_values}, got {rec_x_values}"
+        assert (rec_x_values == exp_x_values).all()
 
         # Test first 5 and last 5 x values of LASIS
         exp_x_values = arr.array('f',
@@ -136,8 +110,7 @@ class TestMarkers:
                                   164.05558777,
                                   163.1633606])
         rec_x_values = markers.loc['x', 'LASIS'][-5:].data
-        assert (
-                rec_x_values == exp_x_values).all(), f"Expected {exp_x_values}, got {rec_x_values}"
+        assert (rec_x_values == exp_x_values).all()
 
     def test_trc_markers_small(self):
         with pytest.raises(NotImplementedError):
@@ -149,16 +122,16 @@ class TestMarkers:
         # Test analogs length
         exp_value = 36
         rec_value = len(analogs.coords['channel'])
-        assert rec_value == exp_value, f"Expected {exp_value} analogs, got {rec_value}"
+        assert rec_value == exp_value
 
         # Test first 5 values of Voltage.RERS
         exp_values = [-2.061715, -2.824317, -3.442063, -3.703248, -4.052287]
         rec_values = list(analogs.loc['ground_force4_vx'][0:5].data)
-        assert rec_values == exp_values, f"Expected {exp_values} , got {rec_values}"
+        assert rec_values == exp_values
 
         exp_value = 2.48
         rec_value = analogs.coords['time'][0]
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value}"
+        assert rec_value == exp_value
 
 
 class TestAnalogs:
@@ -169,17 +142,17 @@ class TestAnalogs:
         # Test analogs length
         exp_value = 42
         rec_value = len(analogs.coords['channel'])
-        assert rec_value == exp_value, f"Expected {exp_value} analogs, got {rec_value}"
+        assert rec_value == exp_value
 
         # Test first 5 values of Voltage.RERS
         exp_values = [0.024871826171875, 0.01682281494140625, 0.00705718994140625,
                       -0.0067138671875, -0.01224517822265625]
         rec_values = list(analogs.loc['Voltage.RERS'][0:5].data)
-        assert rec_values == exp_values, f"Expected {exp_values} , got {rec_values}"
+        assert rec_values == exp_values
 
         exp_value = 2.48
         rec_value = analogs.coords['time'][0]
-        assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value}"
+        assert rec_value == exp_value
 
     def test_sto_analogs_small(self):
         with pytest.raises(NotImplementedError):
@@ -196,11 +169,11 @@ class TestAnalysis:
         analysis = AnalysisInputReader(INPUT_C3D_SMALL, configs).get_analysis()
         rec_value = analysis.shape[0]
         exp_value = 126
-        assert rec_value == exp_value, f"Expected {exp_value} features, got {rec_value}"
+        assert rec_value == exp_value
 
         rec_value = analysis.shape[1]
         exp_value = 337
-        assert rec_value == exp_value, f"Expected {exp_value} frames, got {rec_value}"
+        assert rec_value == exp_value
 
     def test_reshape(self):
         configs = MappingConfigs(Path('tests/config/pig_config.yaml'))
@@ -215,4 +188,4 @@ class TestAnalysis:
                 if not np.isnan(markers.loc[old_axis, old_label, time]):
                     rec_value = analysis.loc[new_label, time]
                     exp_value = markers.loc[old_axis, old_label, time]
-                    assert rec_value == exp_value, f"Expected {exp_value}, got {rec_value} in {new_label} {time}"
+                    assert rec_value == exp_value
