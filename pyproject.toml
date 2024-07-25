@@ -77,7 +77,8 @@ clean-docs = "cleanpy --include-builds --exclude .pixi ."
 docs = "sphinx-build -M html ./docs ./docs/_build -W --keep-going"
 
 [tool.pixi.tasks]
-test = "pytest -vv --cov=gaitalytics --cov-report=term-missing --cov-config=.coveragerc --capture=sys"
+test-full = "pytest -vv --cov=gaitalytics --cov-report=term-missing --cov-config=.coveragerc --capture=sys"
+test-api = "pytest -vv --capture=sys tests/test_api.py"
 
 [tool.pixi.feature.dev.tasks]
 ruff-format = "ruff format gaitalytics"

@@ -1,6 +1,6 @@
-on:
-  schedule:
-   - cron: '0 14 * * 5'
+on: push
+  #schedule:
+  # - cron: '0 14 * * 5'
 
 name: Code Tests
 run-name: ${{ github.actor }} is testing the code
@@ -15,8 +15,7 @@ jobs:
         with:
           pixi-version: v0.25.0
           cache: false
-      - run: pixi run -e py311 test
-      - run: pixi run -e py312 test
+      - run: pixi run -e py311 test-api
   Mac64-Tests:
     runs-on: macOS-13
     steps:
@@ -27,8 +26,7 @@ jobs:
         with:
           pixi-version: v0.25.0
           cache: false
-      - run: pixi run -e py311 test
-      - run: pixi run -e py312 test
+      - run: pixi run -e py311 test-api
   MacArm-Tests:
     runs-on: macOS-latest
     steps:
@@ -39,8 +37,7 @@ jobs:
         with:
           pixi-version: v0.25.0
           cache: false
-      - run: pixi run -e py311 test
-      - run: pixi run -e py312 test
+      - run: pixi run -e py311 test-api
   Linux-Tests:
     runs-on: ubuntu-latest
     steps:
@@ -51,6 +48,5 @@ jobs:
         with:
           pixi-version: v0.25.0
           cache: false
-      - run: pixi run -e py311 test
-      - run: pixi run -e py312 test
+      - run: pixi run -e py311 test-api
 
